@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\PokemonController::class, 'index'])
+    ->name('pokemons.index');
+
+Route::get('/pokemon/{name}', [App\Http\Controllers\PokemonController::class, 'show'])
+    ->name('pokemons.show');
+
+Route::fallback(function () { abort(404);});
+
+
+
