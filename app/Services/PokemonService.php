@@ -16,30 +16,81 @@ class PokemonService
         $this->client = new Client(['base_uri' => config('services.pokemon.base_url')]);
     }
 
-    public function getAll(int $page = 1, int $limit = 50): array
+    public function getAll(int $page = 1, int $limit = 32): array
     {
-        $promises = [];
+        [$offset, $limit] = $this->getQueryParams($page, $limit);
 
-        $offset = $this->getOffset($page, $limit);
-
-        $url = "pokemon?offset={$offset}&limit={$limit}";
+        $url = "pokemon-species?offset={$offset}&limit={$limit}";
 
         $pokemonData = Cache::remember($url, 3600, function () use ($url) {
             $response = $this->client->requestAsync('GET', $url)->wait();
 
-            return json_decode($response->getBody()->getContents(), true);
+            $results = json_decode($response->getBody()->getContents(), true)['results'];
+
+            return $this->pushIdPokemon($results);
         });
 
-        $cachedPokemons = [];
+        return $this->getEachPokemon($pokemonData);
+    }
 
-        foreach ($pokemonData['results'] as $pokemon) {
-            if (Cache::has($pokemon['name'])) {
-                $cachedPokemons[] = $pokemon['name'];
+    public function getOne(string $id): array
+    {
+        
+
+        return Cache::remember('pokemon-' . $id, 3600, function () use ($id) {
+            try {
+                $response = $this->client->getAsync("pokemon/{$id}")->wait();
+
+            } catch (\Exception $e) {
+                Log::info("Error haciendo la petición al recurso '{$id}'");
+
+                return [];
+            }
+
+            return json_decode($response->getBody()->getContents(), true);
+        });
+    }
+
+    public function getAllBySearch(string $name): array
+    {
+        $url = "pokemon-species?limit={$this->getTotal()}";
+
+        $pokemonData = Cache::remember('search:' . strtolower($name), 3600, function () use ($url, $name) {
+            $response = $this->client->requestAsync('GET', $url)->wait();
+
+            $results = json_decode($response->getBody()->getContents(), true)['results'];
+
+            $search = array_filter($results, fn ($pokemon) => str_contains($pokemon['name'], strtolower($name)));
+
+            return $this->pushIdPokemon($search);
+        });
+
+        return $this->getEachPokemon($pokemonData);
+    }
+
+    public function getTotal(): int
+    {
+        return Cache::remember('total', 3600, function () {
+            $response = $this->client->requestAsync('GET', 'pokemon-species?limit=1')->wait();
+
+            return json_decode($response->getBody()->getContents(), true)['count'];
+        });
+    }
+
+    private function getEachPokemon(array $data): array
+    {
+        $promises = [];
+        $cachedIds = [];
+        $prefix = 'pokemon-';
+
+        foreach ($data as $pokemon) {
+            if (Cache::has($prefix . $pokemon['id'])) {
+                $cachedIds[] = $pokemon['id'];
 
                 continue;
             }
 
-            $promises[] = $this->client->getAsync($pokemon['url']);
+            $promises[] = $this->client->requestAsync('GET', str_replace('-species', '', $pokemon['url']));
         }
 
         $results = Utils::settle($promises)->wait();
@@ -51,38 +102,35 @@ class PokemonService
 
             $pokemons[] = $result;
 
-            Cache::put($result['name'], $result);
+            Cache::put($prefix . $result['id'], $result);
         }
 
-        foreach ($cachedPokemons as $name) {
-            $pokemons[] = Cache::get($name);
+        foreach ($cachedIds as $id) {
+            $pokemons[] = Cache::get($prefix . $id);
         }
 
-        return collect($pokemons)->sortBy('id')->toArray();
+        usort($pokemons, fn ($a, $b) => $a['id'] <=> $b['id']);
+
+        return $pokemons;
     }
 
-    public function getByName(string $name): array
+    private function pushIdPokemon (array $data): array
     {
-        return Cache::remember($name, 3600, function () use ($name) {
-            try {
-                $response = $this->client->getAsync("pokemon/{$name}")->wait();
+       return array_map(function ($pokemon) {
+            $pokemon['id'] = explode('/', $pokemon['url'])[6];
 
-            } catch (\Exception $e) {
-                Log::info("Error haciendo la petición al recurso '{$name}'");
-
-                return [];
-            }
-
-            return json_decode($response->getBody()->getContents(), true);
-        });
+            return $pokemon;
+        }, $data);
     }
 
-    private function getOffset(int $page, int $limit): int
+    private function getQueryParams(int $page, int $limit): array
     {
-        if ($page === 1) return 0;
+        if ($page === 1) return [0, $limit];
 
         $count = $page - 1;
 
-        return $limit * $count;
+        $nextOffset = $limit * $count;
+
+        return [$nextOffset, $limit];
     }
 }

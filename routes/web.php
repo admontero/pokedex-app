@@ -16,10 +16,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [App\Http\Controllers\PokemonController::class, 'index'])
     ->name('pokemons.index');
 
-Route::get('/pokemon/{name}', [App\Http\Controllers\PokemonController::class, 'show'])
-    ->name('pokemons.show');
+Route::get('/pokemon/search', App\Http\Controllers\PokemonSearchController::class)
+    ->name('pokemons.search');
 
-Route::fallback(function () { abort(404);});
+Route::get('/pokemon/{id}', [App\Http\Controllers\PokemonController::class, 'show'])
+    ->name('pokemons.show')
+    ->where('id', '[0-9]+');
 
-
+Route::fallback(function () {
+    abort(404);
+});
 

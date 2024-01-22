@@ -6,7 +6,7 @@ use App\Http\Requests\PokemonIndexRequest;
 use App\Services\PokemonService;
 use App\ViewModels\PokemonsViewModel;
 use App\ViewModels\PokemonViewModel;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class PokemonController extends Controller
@@ -30,14 +30,18 @@ class PokemonController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $name): View
+    public function show(string $id): View
     {
-        $pokemon = $this->pokemonService->getByName($name);
+        $pokemon = $this->pokemonService->getOne($id);
 
-        if (! $pokemon) abort(404);
+        $total = $this->pokemonService->getTotal();
+
+        if (! $pokemon || $id > $total) abort(404);
 
         $viewModel = new PokemonViewModel($pokemon);
 
-        return view('pokemons.show', $viewModel);
+        return view('pokemons.show', $viewModel, [
+            'total' => $total,
+        ]);
     }
 }

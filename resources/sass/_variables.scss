@@ -1,1 +1,16 @@
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap/scss/mixins";
+
 $font-family-sans-serif: 'Nunito', sans-serif;
+$enable-negative-margins: true;
+
+$custom-colors: (
+  "pokemon-red": #E60013,
+  "pokemon-blue": #3269B1,
+  "pokemon-yellow": #FFCB05,
+);
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+@import 'node_modules/bootstrap/scss/bootstrap';

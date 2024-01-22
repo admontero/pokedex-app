@@ -17,7 +17,7 @@ class PokemonsViewModel extends ViewModel
             return (object) [
                 'id' => $pokemon['id'],
                 'name' => $pokemon['name'],
-                'image' => $pokemon['sprites']['other']['official-artwork']['front_default'] ?? asset('vendor/images/not-found.jpg'),
+                'image' => $pokemon['sprites']['other']['official-artwork']['front_default'] ?? 'https://placehold.co/300x300/white/lightgray?text=NOT+FOUND',
                 'types' => collect($pokemon['types'])->map(fn ($type) => $type['type']['name']),
             ];
         });

@@ -2,8 +2,6 @@
 
 @import 'variables';
 
-@import 'node_modules/bootstrap/scss/bootstrap';
-
 @font-face {
     font-family: 'Pokemon Solid';
     src: url('/public/vendor/fonts/Pokemon-Solid.ttf');
@@ -20,42 +18,6 @@
 
 .pokemon-hollow {
     font-family: 'Pokemon Hollow', 'nunito';
-}
-
-.bg-pokemon-red {
-    background-color: #E60013;
-}
-
-.text-pokemon-red {
-    color: #E60013;
-}
-
-.border-pokemon-red {
-    border: 2px solid #E60013;
-}
-
-.bg-pokemon-blue {
-    background-color: #3269B1;
-}
-
-.text-pokemon-blue {
-    color: #3269B1;
-}
-
-.border-pokemon-blue {
-    border: 2px solid #3269B1;
-}
-
-.bg-pokemon-yellow {
-    background-color: #FFCB05;
-}
-
-.text-pokemon-yellow {
-    color: #FFCB05;
-}
-
-.border-pokemon-yellow {
-    border: 2px solid #FFCB05;
 }
 
 .steel {

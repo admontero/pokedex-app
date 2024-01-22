@@ -1,10 +1,10 @@
 @props(['pokemon'])
 
 <div class="col">
-    <div class="pokemon-card card shadow bg-white mb-4">
+    <div class="pokemon-card card shadow" id="{{ $pokemon->name }}">
         <img
             class="card-img-top mx-auto"
-            style="width: 250px;"
+            style="max-width: 260px;"
             src="{{ $pokemon->image }}"
             alt="{{ $pokemon->name }} image"
         >
@@ -13,7 +13,7 @@
             <h5 class="card-title text-capitalize pokemon-solid text-center">
                 <a
                     class="text-white text-decoration-none"
-                    href="{{ route('pokemons.show', $pokemon->name) }}"
+                    href="{{ route('pokemons.show', $pokemon->id) }}"
                 >
                     {{ $pokemon->name }}
                 </a>
