@@ -3,7 +3,7 @@
         <div class="col-md-4">
             <a
                 class="btn btn-sm bg-pokemon-blue text-white d-inline-flex align-items-center"
-                onclick="window.history.back()"
+                href="javascript:window.history.back()"
                 role="button"
             >
                 <img src="https://img.icons8.com/office/30/000000/pokeball.png" class="me-2"/>

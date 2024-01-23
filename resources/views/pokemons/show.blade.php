@@ -3,7 +3,7 @@
         <div class="col-md-4">
             <a
                 class="btn btn-sm bg-pokemon-blue text-white d-inline-flex align-items-center"
-                onclick="window.history.back()"
+                href="javascript:window.history.back()"
                 role="button"
             >
                 <img src="https://img.icons8.com/office/30/000000/pokeball.png" class="me-2"/>
@@ -44,7 +44,7 @@
         <div class="col-md-8">
             <div class="d-flex justify-content-between align-items-center h-100">
                 <a
-                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ $pokemon->id === 1 ? 'disabled' : '' }}"
+                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ $pokemon->id == 1 ? 'disabled' : '' }}"
                     href="{{ route('pokemons.show', $pokemon->id - 1) }}"
                     role="button"
                 >
@@ -53,7 +53,7 @@
                 </a>
 
                 <a
-                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ $pokemon->id === $total ? 'disabled' : '' }}"
+                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ $pokemon->id == $total ? 'disabled' : '' }}"
                     href="{{ route('pokemons.show', $pokemon->id + 1) }}"
                     role="button"
                 >

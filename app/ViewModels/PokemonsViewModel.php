@@ -15,10 +15,10 @@ class PokemonsViewModel extends ViewModel
     {
         $pokemons = collect($this->pokemons)->map(function ($pokemon) {
             return (object) [
-                'id' => $pokemon['id'],
-                'name' => $pokemon['name'],
+                'id' => $pokemon['id'] ?? null,
+                'name' => $pokemon['name'] ?? null,
                 'image' => $pokemon['sprites']['other']['official-artwork']['front_default'] ?? 'https://placehold.co/300x300/white/lightgray?text=NOT+FOUND',
-                'types' => collect($pokemon['types'])->map(fn ($type) => $type['type']['name']),
+                'types' => isset($pokemon['types']) ? collect($pokemon['types'])->map(fn ($type) => $type['type']['name']) : collect(),
             ];
         });
 

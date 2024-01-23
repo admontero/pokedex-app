@@ -6,7 +6,6 @@ use App\Http\Requests\PokemonIndexRequest;
 use App\Services\PokemonService;
 use App\ViewModels\PokemonsViewModel;
 use App\ViewModels\PokemonViewModel;
-use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class PokemonController extends Controller
@@ -20,7 +19,11 @@ class PokemonController extends Controller
      */
     public function index(PokemonIndexRequest $request): View
     {
-        $pokemons = $this->pokemonService->getAll($request->page ?? 1);
+        try {
+            $pokemons = $this->pokemonService->getAll($request->page ?? 1);
+        } catch (\Exception $e) {
+            return view('errors.500', ['error' => $e->getMessage()]);
+        }
 
         $viewModel = new PokemonsViewModel($pokemons);
 
@@ -32,9 +35,13 @@ class PokemonController extends Controller
      */
     public function show(string $id): View
     {
-        $pokemon = $this->pokemonService->getOne($id);
+        try {
+            $pokemon = $this->pokemonService->getOne($id);
 
-        $total = $this->pokemonService->getTotal();
+            $total = $this->pokemonService->getTotal();
+        } catch (\Exception $e) {
+            return view('errors.500', ['error' => $e->getMessage()]);
+        }
 
         if (! $pokemon || $id > $total) abort(404);
 

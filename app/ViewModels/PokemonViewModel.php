@@ -14,15 +14,15 @@ class PokemonViewModel extends ViewModel
     public function pokemon(): object
     {
         $pokemon = (object) [
-            'id' => $this->pokemon['id'],
-            'name' => $this->pokemon['name'],
-            'image' => $this->pokemon['sprites']['other']['official-artwork']['front_default'] ?? 'https://placehold.co/300x300/white/lightgray?text=NOT+FOUND',
-            'weight' => ($this->pokemon['weight'] / 10) . ' kg',
-            'height' => $this->pokemon['height'] . ' m',
-            'base_experience' => $this->pokemon['base_experience'],
-            'types' => collect($this->pokemon['types'])->map(fn($type) => $type['type']['name']),
-            'abilities' => collect($this->pokemon['abilities'])->map(fn($type) => str_replace('-', ' ', $type['ability']['name'])),
-            'items' => collect($this->pokemon['held_items'])->map(fn($type) => str_replace('-', ' ', $type['item']['name'])),
+            'id' => $this->formatId(),
+            'name' => $this->formatName(),
+            'image' => $this->formatImage(),
+            'weight' => $this->formatWeight(),
+            'height' => $this->formatHeight(),
+            'base_experience' => $this->formatBaseExperience(),
+            'types' => $this->formatTypes(),
+            'abilities' => $this->formatAbilities(),
+            'items' => $this->formatItems(),
             'stats' => $this->formatStats(),
             'sprites' => $this->formatSprites(),
             'female_sprites' => $this->formatFemaleSprites(),
@@ -31,8 +31,61 @@ class PokemonViewModel extends ViewModel
         return $pokemon;
     }
 
-    private function formatStats(): Collection
+    protected function formatId(): string
     {
+        return $this->pokemon['id'] ?? '';
+    }
+
+    protected function formatName(): string
+    {
+        return $this->pokemon['name'] ?? '';
+    }
+
+    protected function formatImage(): string
+    {
+        return $this->pokemon['sprites']['other']['official-artwork']['front_default'] ?? 'https://placehold.co/300x300/white/lightgray?text=NOT+FOUND';
+    }
+
+    protected function formatWeight(): string
+    {
+        return isset($this->pokemon['weight']) ? ($this->pokemon['weight'] / 10) . ' kg' : '';
+    }
+
+    protected function formatHeight(): string
+    {
+        return isset($this->pokemon['height']) ? ($this->pokemon['height'] / 10) . ' m' : '';
+    }
+
+    protected function formatBaseExperience(): string
+    {
+        return $this->pokemon['base_experience'] ?? '';
+    }
+
+    protected function formatTypes(): Collection
+    {
+        if (! isset($this->pokemon['types'])) return collect();
+
+        return collect($this->pokemon['types'])->map(fn($type) => $type['type']['name']);
+    }
+
+    protected function formatAbilities(): string
+    {
+        if (! isset($this->pokemon['abilities'])) return '';
+
+        return collect($this->pokemon['abilities'])->map(fn($type) => str_replace('-', ' ', $type['ability']['name']));
+    }
+
+    protected function formatItems(): string
+    {
+        if (! isset($this->pokemon['held_items'])) return '';
+
+        return collect($this->pokemon['held_items'])->map(fn($type) => str_replace('-', ' ', $type['item']['name']));
+    }
+
+    protected function formatStats(): Collection
+    {
+        if (! isset($this->pokemon['stats'])) return collect();
+
         return collect($this->pokemon['stats'])
             ->map(function ($stat) {
                 return (object) [
@@ -43,8 +96,10 @@ class PokemonViewModel extends ViewModel
             });
     }
 
-    private function formatSprites(): Collection
+    protected function formatSprites(): Collection
     {
+        if (! isset($this->pokemon['sprites'])) return collect();
+
         return collect($this->pokemon['sprites'])
             ->only('back_default', 'back_shiny', 'front_default', 'front_shiny')
             ->mapWithKeys(function ($item, $key) {
@@ -57,8 +112,10 @@ class PokemonViewModel extends ViewModel
             });
     }
 
-    private function formatFemaleSprites(): Collection
+    protected function formatFemaleSprites(): Collection
     {
+        if (! isset($this->pokemon['sprites'])) return collect();
+
         return collect($this->pokemon['sprites'])
             ->only('back_female', 'back_shiny_female', 'front_female', 'front_shiny_female')
             ->reject(fn ($value) => is_null($value))

@@ -1,25 +1,26 @@
 <x-app-layout>
-    <div class="bg-white text-center py-5 px-2 mb-3">
+    <div class="card py-5 px-2 mb-3 shadow-sm">
         <form action="{{ route('pokemons.search') }}" method="GET">
-            <h1 class="display-4 fw-bold">Bienvenid@ a la Laravel Pokédex</h1>
+            <h1 class="text-center display-4 fw-bold">Bienvenid@ a la Laravel Pokédex</h1>
 
-            <p class="lead">En esta aplicación podrás visualizar la información de cualquier pokémon. Lets do it!</p>
+            <p class="text-center lead">En esta aplicación podrás visualizar la información de cualquier pokémon. Lets do it!</p>
 
             <div class="row">
                 <div class="col-md-8 col-lg-6 mx-auto">
                     <input
-                        class="form-control @error('name') is-invalid @enderror"
+                        class="form-control @error('name') is-invalid @enderror bg-light"
                         type="search"
                         name="name"
                         id="name"
                         placeholder="Nombre del Pokémon. Ej: bulbasaur"
                     />
-                </div>
-            </div>
 
-            @error('name')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+                    @error('name')
+                        <div class="invalid-feedback d-block small">{{ $message }}</div>
+                    @enderror
+                </div>
+
+            </div>
         </form>
     </div>
 

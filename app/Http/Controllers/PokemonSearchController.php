@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PokemonSearchRequest;
 use App\Services\PokemonService;
 use App\ViewModels\PokemonsViewModel;
-use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class PokemonSearchController extends Controller
@@ -15,7 +14,11 @@ class PokemonSearchController extends Controller
      */
     public function __invoke(PokemonSearchRequest $request, PokemonService $pokemonService): View
     {
-        $pokemons = $pokemonService->getAllBySearch($request->safe()->name);
+        try {
+            $pokemons = $pokemonService->getAllBySearch($request->safe()->name);
+        } catch (\Exception $e) {
+            return view('errors.500', ['error' => $e->getMessage()]);
+        }
 
         $viewModel = new PokemonsViewModel($pokemons);
 

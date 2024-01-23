@@ -5,7 +5,6 @@ namespace App\Services;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\Utils;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class PokemonService
 {
@@ -22,69 +21,125 @@ class PokemonService
 
         $url = "pokemon-species?offset={$offset}&limit={$limit}";
 
-        $pokemonData = Cache::remember($url, 3600, function () use ($url) {
-            $response = $this->client->requestAsync('GET', $url)->wait();
+        if (Cache::has($url)) {
+            return $this->getEachPokemon(Cache::get($url));
+        }
 
-            $results = json_decode($response->getBody()->getContents(), true)['results'];
+        $response = $this->client->requestAsync('GET', $url)->wait();
 
-            return $this->pushIdPokemon($results);
-        });
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
+        };
 
-        return $this->getEachPokemon($pokemonData);
+        $results = json_decode($response->getBody()->getContents(), true)['results'];
+
+        $data = $this->pushIdPokemon($results);
+
+        Cache::put($url, $data, 60 * 60);
+
+        return $this->getEachPokemon($data);
     }
 
     public function getOne(string $id): array
     {
-        
+        $key = "pokemon-{$id}";
 
-        return Cache::remember('pokemon-' . $id, 3600, function () use ($id) {
-            try {
-                $response = $this->client->getAsync("pokemon/{$id}")->wait();
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
 
-            } catch (\Exception $e) {
-                Log::info("Error haciendo la petición al recurso '{$id}'");
+        $response = $this->client->getAsync("pokemon/{$id}")->wait();
 
-                return [];
-            }
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
+        }
 
-            return json_decode($response->getBody()->getContents(), true);
-        });
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        Cache::put($key, $data, 60 * 60);
+
+        return $data;
     }
 
     public function getAllBySearch(string $name): array
     {
+        $name = strtolower($name);
+
+        $key = "search:{$name}";
+
+        if (Cache::has($key)) {
+            return $this->getEachPokemon(Cache::get($key));
+        }
+
         $url = "pokemon-species?limit={$this->getTotal()}";
 
-        $pokemonData = Cache::remember('search:' . strtolower($name), 3600, function () use ($url, $name) {
-            $response = $this->client->requestAsync('GET', $url)->wait();
+        $response = $this->client->requestAsync('GET', $url)->wait();
 
-            $results = json_decode($response->getBody()->getContents(), true)['results'];
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
+        }
 
-            $search = array_filter($results, fn ($pokemon) => str_contains($pokemon['name'], strtolower($name)));
+        $results = json_decode($response->getBody()->getContents(), true)['results'];
 
-            return $this->pushIdPokemon($search);
-        });
+        $search = array_filter($results, fn ($pokemon) => str_contains($pokemon['name'], $name));
 
-        return $this->getEachPokemon($pokemonData);
+        $data = $this->pushIdPokemon($search);
+
+        Cache::put($key, $data, 60 * 60);
+
+        return $this->getEachPokemon($data);
+    }
+
+    public function getSpecie(int $id): array
+    {
+        $key = "pokemon-specie-{$id}";
+
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $response = $this->client->getAsync("pokemon-species/{$id}")->wait();
+
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
+        }
+
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        Cache::put($key, $data, 60 * 60);
+
+        return $data;
     }
 
     public function getTotal(): int
     {
-        return Cache::remember('total', 3600, function () {
-            $response = $this->client->requestAsync('GET', 'pokemon-species?limit=1')->wait();
+        $key = 'total';
 
-            return json_decode($response->getBody()->getContents(), true)['count'];
-        });
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $response = $this->client->requestAsync('GET', 'pokemon-species?limit=1')->wait();
+
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
+        }
+
+        $data = json_decode($response->getBody()->getContents(), true)['count'];
+
+        Cache::put($key, $data, 60 * 60);
+
+        return $data;
     }
 
     private function getEachPokemon(array $data): array
     {
         $promises = [];
         $cachedIds = [];
-        $prefix = 'pokemon-';
+        $keyPrefix = 'pokemon-';
 
         foreach ($data as $pokemon) {
-            if (Cache::has($prefix . $pokemon['id'])) {
+            if (Cache::has($keyPrefix . $pokemon['id'])) {
                 $cachedIds[] = $pokemon['id'];
 
                 continue;
@@ -93,20 +148,24 @@ class PokemonService
             $promises[] = $this->client->requestAsync('GET', str_replace('-species', '', $pokemon['url']));
         }
 
-        $results = Utils::settle($promises)->wait();
+        $responses = Utils::settle($promises)->wait();
 
         $pokemons = [];
 
-        foreach ($results as $result) {
-            $result = json_decode($result['value']->getBody()->getContents(), true);
+        foreach ($responses as $response) {
+            if ($response['value']->getStatusCode() < 200 || $response['value']->getStatusCode() >= 300) {
+                continue;
+            }
 
-            $pokemons[] = $result;
+            $data = json_decode($response['value']->getBody()->getContents(), true);
 
-            Cache::put($prefix . $result['id'], $result);
+            $pokemons[] = $data;
+
+            Cache::put($keyPrefix . $data['id'], $data, 60 * 60);
         }
 
         foreach ($cachedIds as $id) {
-            $pokemons[] = Cache::get($prefix . $id);
+            $pokemons[] = Cache::get($keyPrefix . $id);
         }
 
         usort($pokemons, fn ($a, $b) => $a['id'] <=> $b['id']);
