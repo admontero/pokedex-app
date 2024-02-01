@@ -38,9 +38,28 @@
 
     <h3>
         <span class="text-pokemon-red">{{ $pokemons->count() }}</span>
-        resultados con el término
-        <span class="text-pokemon-red">{{ request()->name }}</span>
+        resultados de la búsqueda:
     </h3>
+
+    <p class="small">
+        <span class="fw-bold">Término:</span>
+        @if (request()->name)
+            <span class="text-pokemon-red">{{ request()->name }}</span>
+        @else
+            <span class="text-muted fst-italic">--</span>
+        @endif
+
+        <span class="mx-2">/</span>
+
+        <span class="fw-bold">Tipo:</span>
+        @if (request()->type)
+            <span class="badge {{ request()->type }} fw-semibold px-2 py-1 text-capitalize shadow-lg">
+                {{ request()->type }}
+            </span>
+        @else
+            <span class="text-muted fst-italic">--</span>
+        @endif
+    </p>
 
     <hr>
 

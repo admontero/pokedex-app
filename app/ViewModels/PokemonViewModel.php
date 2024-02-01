@@ -8,7 +8,8 @@ use Spatie\ViewModels\ViewModel;
 class PokemonViewModel extends ViewModel
 {
     public function __construct(
-        public array $pokemon
+        public array $pokemon,
+        public int $total,
     ){}
 
     public function pokemon(): object
@@ -33,12 +34,12 @@ class PokemonViewModel extends ViewModel
 
     protected function formatId(): string
     {
-        return $this->pokemon['id'] ?? '';
+        return $this->pokemon['id'] ?? '--';
     }
 
     protected function formatName(): string
     {
-        return $this->pokemon['name'] ?? '';
+        return $this->pokemon['name'] ?? '--';
     }
 
     protected function formatImage(): string
@@ -48,17 +49,17 @@ class PokemonViewModel extends ViewModel
 
     protected function formatWeight(): string
     {
-        return isset($this->pokemon['weight']) ? ($this->pokemon['weight'] / 10) . ' kg' : '';
+        return isset($this->pokemon['weight']) ? ($this->pokemon['weight'] / 10) . ' kg' : '--';
     }
 
     protected function formatHeight(): string
     {
-        return isset($this->pokemon['height']) ? ($this->pokemon['height'] / 10) . ' m' : '';
+        return isset($this->pokemon['height']) ? ($this->pokemon['height'] / 10) . ' m' : '--';
     }
 
     protected function formatBaseExperience(): string
     {
-        return $this->pokemon['base_experience'] ?? '';
+        return $this->pokemon['base_experience'] ?? '--';
     }
 
     protected function formatTypes(): Collection
@@ -70,14 +71,14 @@ class PokemonViewModel extends ViewModel
 
     protected function formatAbilities(): string
     {
-        if (! isset($this->pokemon['abilities'])) return '';
+        if (! isset($this->pokemon['abilities'])) return '--';
 
         return collect($this->pokemon['abilities'])->map(fn($type) => str_replace('-', ' ', $type['ability']['name']));
     }
 
     protected function formatItems(): string
     {
-        if (! isset($this->pokemon['held_items'])) return '';
+        if (! isset($this->pokemon['held_items'])) return '--';
 
         return collect($this->pokemon['held_items'])->map(fn($type) => str_replace('-', ' ', $type['item']['name']));
     }

@@ -8,7 +8,7 @@ use Spatie\ViewModels\ViewModel;
 class PokemonsViewModel extends ViewModel
 {
     public function __construct(
-        public array $pokemons
+        public array $pokemons,
     ){}
 
     public function pokemons(): Collection

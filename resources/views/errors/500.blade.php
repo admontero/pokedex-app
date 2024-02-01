@@ -7,7 +7,7 @@
                 <div class="alert alert-danger lead" role="alert">
                     <span class="fw-semibold">Error</span>
                     <hr>
-                    {{ $error ?? 'Error al consultar la API, inténtelo de nuevo más tarde...' }}
+                    {{ $exception->getMessage() }}
                 </div>
             </div>
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\PokemonSearchDTO;
 use App\Http\Requests\PokemonSearchRequest;
 use App\Services\PokemonService;
 use App\ViewModels\PokemonsViewModel;
@@ -14,13 +15,9 @@ class PokemonSearchController extends Controller
      */
     public function __invoke(PokemonSearchRequest $request, PokemonService $pokemonService): View
     {
-        try {
-            $pokemons = $pokemonService->getAllBySearch($request->safe()->name);
-        } catch (\Exception $e) {
-            return view('errors.500', ['error' => $e->getMessage()]);
-        }
-
-        $viewModel = new PokemonsViewModel($pokemons);
+        $viewModel = new PokemonsViewModel(
+            pokemons: $pokemonService->getAllBySearch(PokemonSearchDTO::fromRequest($request))
+        );
 
         return view('pokemons.search', $viewModel);
     }

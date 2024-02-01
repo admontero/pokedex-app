@@ -5,14 +5,15 @@
 
             <p class="text-center lead">En esta aplicación podrás visualizar la información de cualquier pokémon. Lets do it!</p>
 
-            <div class="row">
-                <div class="col-md-8 col-lg-6 mx-auto">
+            <div class="row g-2 justify-content-center">
+                <div class="col-lg-4 mb-1 mb-lg-0">
                     <input
-                        class="form-control @error('name') is-invalid @enderror bg-light"
+                        class="form-control @error('name') is-invalid @enderror"
                         type="search"
                         name="name"
                         id="name"
-                        placeholder="Nombre del Pokémon. Ej: bulbasaur"
+                        placeholder="Nombre de pokémon o cualquier término..."
+                        value="{{ old('name') }}"
                     />
 
                     @error('name')
@@ -20,6 +21,41 @@
                     @enderror
                 </div>
 
+                <div class="col-lg-3 mb-1 mb-lg-0">
+                    <select name="type" class="form-select" aria-label="Default select example">
+                        <option selected value="">Selecciona un tipo</option>
+                        <option value="normal" @selected(old('type') == 'normal')>Normal</option>
+                        <option value="fighting" @selected(old('type') == 'fighting')>Fighting</option>
+                        <option value="flying" @selected(old('type') == 'flying')>Flying</option>
+                        <option value="poison" @selected(old('type') == 'poison')>Poison</option>
+                        <option value="ground" @selected(old('type') == 'ground')>Ground</option>
+                        <option value="rock" @selected(old('type') == 'rock')>Rock</option>
+                        <option value="bug" @selected(old('type') == 'bug')>Bug</option>
+                        <option value="ghost" @selected(old('type') == 'ghost')>Ghost</option>
+                        <option value="steel" @selected(old('type') == 'steel')>Steel</option>
+                        <option value="fire" @selected(old('type') == 'fire')>Fire</option>
+                        <option value="water" @selected(old('type') == 'water')>Water</option>
+                        <option value="grass" @selected(old('type') == 'grass')>Grass</option>
+                        <option value="electric" @selected(old('type') == 'electric')>Electric</option>
+                        <option value="psychic" @selected(old('type') == 'psychic')>Psychic</option>
+                        <option value="ice" @selected(old('type') == 'ice')>Ice</option>
+                        <option value="dragon" @selected(old('type') == 'dragon')>Dragon</option>
+                        <option value="dark" @selected(old('type') == 'dark')>Dark</option>
+                        <option value="fairy" @selected(old('type') == 'fairy')>Fairy</option>
+                    </select>
+
+                    @error('type')
+                        <div class="invalid-feedback d-block small">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-lg-1">
+                    <div class="d-grid">
+                        <button class="btn btn-pokemon-red" type="submit">
+                            Buscar
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>

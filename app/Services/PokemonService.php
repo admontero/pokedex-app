@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\DTOs\PokemonSearchDTO;
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\Utils;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class PokemonService
 {
@@ -15,7 +17,7 @@ class PokemonService
         $this->client = new Client(['base_uri' => config('services.pokemon.base_url')]);
     }
 
-    public function getAll(int $page = 1, int $limit = 32): array
+    public function getAll(int $page = 1, int $limit = 20): array
     {
         [$offset, $limit] = $this->getQueryParams($page, $limit);
 
@@ -25,22 +27,28 @@ class PokemonService
             return $this->getEachPokemon(Cache::get($url));
         }
 
-        $response = $this->client->requestAsync('GET', $url)->wait();
+        try {
+            $response = $this->client->requestAsync('GET', $url)->wait();
 
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
-        };
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                throw new \Exception('', $response->getStatusCode());
+            };
+        } catch (\Exception $e) {
+            Log::info("Error al obtener el listado de pokemon. Error: " . $e->getMessage());
+
+            abort(500, 'Error al consultar la API, inténtelo de nuevo más tarde...');
+        }
 
         $results = json_decode($response->getBody()->getContents(), true)['results'];
 
-        $data = $this->pushIdPokemon($results);
+        $data = $this->getPokemonId($results);
 
         Cache::put($url, $data, 60 * 60);
 
         return $this->getEachPokemon($data);
     }
 
-    public function getOne(string $id): array
+    public function getOne(int $id): array
     {
         $key = "pokemon-{$id}";
 
@@ -48,10 +56,16 @@ class PokemonService
             return Cache::get($key);
         }
 
-        $response = $this->client->getAsync("pokemon/{$id}")->wait();
+        try {
+            $response = $this->client->getAsync("pokemon/{$id}")->wait();
 
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                throw new \Exception('', $response->getStatusCode());
+            }
+        } catch (\Exception $e) {
+            Log::info("Error al obtener el recurso {$id}. Error: " . $e->getMessage());
+
+            abort(500, 'Error al consultar la API, inténtelo de nuevo más tarde...');
         }
 
         $data = json_decode($response->getBody()->getContents(), true);
@@ -61,57 +75,28 @@ class PokemonService
         return $data;
     }
 
-    public function getAllBySearch(string $name): array
+    public function getAllBySearch(PokemonSearchDTO $dto): array
     {
-        $name = strtolower($name);
+        $cacheKey = '';
 
-        $key = "search:{$name}";
+        $cacheKey .= collect($dto)->sortKeys()->each(fn ($value, $key) => "{$key}:{$value},");
 
-        if (Cache::has($key)) {
-            return $this->getEachPokemon(Cache::get($key));
+        if (Cache::has($cacheKey)) {
+            return $this->getEachPokemon(Cache::get($cacheKey));
         }
 
-        $url = "pokemon-species?limit={$this->getTotal()}";
+        $data = match (true) {
+            ! is_null($dto->type) => $this->filterByType($dto),
+            is_null($dto->type) => $this->filterByName($dto->name),
+            default => [],
+        };
 
-        $response = $this->client->requestAsync('GET', $url)->wait();
-
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
-        }
-
-        $results = json_decode($response->getBody()->getContents(), true)['results'];
-
-        $search = array_filter($results, fn ($pokemon) => str_contains($pokemon['name'], $name));
-
-        $data = $this->pushIdPokemon($search);
-
-        Cache::put($key, $data, 60 * 60);
+        Cache::put($cacheKey, $data, 60 * 60);
 
         return $this->getEachPokemon($data);
     }
 
-    public function getSpecie(int $id): array
-    {
-        $key = "pokemon-specie-{$id}";
-
-        if (Cache::has($key)) {
-            return Cache::get($key);
-        }
-
-        $response = $this->client->getAsync("pokemon-species/{$id}")->wait();
-
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
-        }
-
-        $data = json_decode($response->getBody()->getContents(), true);
-
-        Cache::put($key, $data, 60 * 60);
-
-        return $data;
-    }
-
-    public function getTotal(): int
+    public function getTotal(): int | null
     {
         $key = 'total';
 
@@ -119,10 +104,16 @@ class PokemonService
             return Cache::get($key);
         }
 
-        $response = $this->client->requestAsync('GET', 'pokemon-species?limit=1')->wait();
+        try {
+            $response = $this->client->requestAsync('GET', 'pokemon-species?limit=1')->wait();
 
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-            throw new \Exception('Error al consultar la API, inténtelo de nuevo más tarde...', $response->getStatusCode());
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                throw new \Exception('', $response->getStatusCode());
+            }
+        } catch (\Exception $e) {
+            Log::info('Error al obtener el total de pokemon. Error: ' . $e->getMessage());
+
+            abort(500, 'Error al consultar la API, inténtelo de nuevo más tarde...');
         }
 
         $data = json_decode($response->getBody()->getContents(), true)['count'];
@@ -130,6 +121,56 @@ class PokemonService
         Cache::put($key, $data, 60 * 60);
 
         return $data;
+    }
+
+    private function filterByType(PokemonSearchDTO $dto)
+    {
+        $url = "type/{$dto->type}";
+
+        try {
+            $response = $this->client->requestAsync('GET', $url)->wait();
+
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                throw new \Exception('', $response->getStatusCode());
+            }
+        } catch (\Exception $e) {
+            Log::info("Error en la búsqueda pokemon. Error: " . $e->getMessage());
+
+            abort(500, 'Error al consultar la API, inténtelo de nuevo más tarde...');
+        }
+
+        $results = array_map(function ($pokemon) {
+            return $pokemon['pokemon'];
+        }, json_decode($response->getBody()->getContents(), true)['pokemon']);
+
+        if ($dto->name) {
+            $results = array_filter($results, fn ($pokemon) => str_contains($pokemon['name'], $dto->name));
+        }
+
+        return array_filter($this->getPokemonId($results), fn ($pokemon) => $pokemon['id'] <= $this->getTotal());
+    }
+
+    private function filterByName(string $name): array
+    {
+        $url = "pokemon-species?limit={$this->getTotal()}";
+
+        try {
+            $response = $this->client->requestAsync('GET', $url)->wait();
+
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                throw new \Exception('', $response->getStatusCode());
+            }
+        } catch (\Exception $e) {
+            Log::info("Error en la búsqueda pokemon. Error: " . $e->getMessage());
+
+            abort(500, 'Error al consultar la API, inténtelo de nuevo más tarde...');
+        }
+
+        $results = json_decode($response->getBody()->getContents(), true)['results'];
+
+        $results = array_filter($results, fn ($pokemon) => str_contains($pokemon['name'], $name));
+
+        return $this->getPokemonId($results);
     }
 
     private function getEachPokemon(array $data): array
@@ -148,7 +189,13 @@ class PokemonService
             $promises[] = $this->client->requestAsync('GET', str_replace('-species', '', $pokemon['url']));
         }
 
-        $responses = Utils::settle($promises)->wait();
+        try {
+            $responses = Utils::settle($promises)->wait();
+        } catch (\Exception $e) {
+            Log::info('Error al obtener el listado de pokemon. Error: ' . $e->getMessage());
+
+            abort(500, 'Error al consultar la API, inténtelo de nuevo más tarde...');
+        }
 
         $pokemons = [];
 
@@ -173,7 +220,7 @@ class PokemonService
         return $pokemons;
     }
 
-    private function pushIdPokemon (array $data): array
+    private function getPokemonId(array $data): array
     {
        return array_map(function ($pokemon) {
             $pokemon['id'] = explode('/', $pokemon['url'])[6];
