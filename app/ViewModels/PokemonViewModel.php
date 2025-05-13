@@ -9,7 +9,8 @@ class PokemonViewModel extends ViewModel
 {
     public function __construct(
         public array $pokemon,
-        public int $total,
+        public ?string $previous = null,
+        public ?string $next = null,
     ){}
 
     public function pokemon(): object

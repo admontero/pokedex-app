@@ -1,37 +1,18 @@
 <x-app-layout>
-    <div class="row mb-3">
+    <div class="row align-items-center mb-3">
         <div class="col-md-4">
             <a
                 class="btn btn-sm bg-pokemon-blue text-white d-inline-flex align-items-center"
-                href="javascript:window.history.back()"
+                href="{{ session()->get('backUrl') ?? route('pokemons.index') }}"
                 role="button"
             >
-                <img src="https://img.icons8.com/office/30/000000/pokeball.png" class="me-2"/>
+                <i class="fa fa-arrow-left me-2"></i>
                 Volver
             </a>
             <hr class="d-md-none">
         </div>
         <div class="col-md-8">
-            <form action="{{ route('pokemons.search') }}" method="GET">
-                <div class="input-group shadow-sm">
-                    <span class="input-group-text" id="basic-addon1">
-                        <i class="fa fa-magnifying-glass"></i>
-                    </span>
-
-                    <input
-                        class="form-control @error('name') is-invalid @enderror"
-                        type="search"
-                        name="name"
-                        id="name"
-                        value="{{ old('name') }}"
-                        placeholder="Buscar pokémon. Ej: bulbasaur"
-                    />
-
-                </div>
-                @error('name')
-                    <div class="invalid-feedback d-block small">{{ $message }}</div>
-                @enderror
-            </form>
+            <x-pokemon.form-search />
         </div>
     </div>
 
@@ -44,8 +25,8 @@
         <div class="col-md-8">
             <div class="d-flex justify-content-between align-items-center h-100">
                 <a
-                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ $pokemon->id == 1 ? 'disabled' : '' }}"
-                    href="{{ route('pokemons.show', $pokemon->id - 1) }}"
+                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ !$previous ? 'disabled' : '' }}"
+                    href="{{ $previous ? route('pokemons.show', $previous) : '#' }}"
                     role="button"
                 >
                     <i class="fa fa-arrow-left-long me-2"></i>
@@ -53,8 +34,8 @@
                 </a>
 
                 <a
-                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ $pokemon->id == $total ? 'disabled' : '' }}"
-                    href="{{ route('pokemons.show', $pokemon->id + 1) }}"
+                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ !$next ? 'disabled' : '' }}"
+                    href="{{ $next ? route('pokemons.show', $next) : '#' }}"
                     role="button"
                 >
                     Siguiente
@@ -194,7 +175,7 @@
                                 @endfor
                             @else
                                 <p class="text-center fst-italic mb-0">
-                                    Sin diferencia de género
+                                    Sin diferencias de género
                                 </p>
                             @endif
 

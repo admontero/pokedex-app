@@ -19,9 +19,14 @@ class PokemonController extends Controller
      */
     public function index(PokemonIndexRequest $request): View
     {
-        $data = $this->pokemonService->getAll($request->page ?? 1);
+        session()->put('backUrl', route('pokemons.index', ['page' => $request->page ?? 1]));
 
-        $viewModel = new PokemonsViewModel($data);
+        $pokemonList = $this->pokemonService->getAllPokemon();
+
+        $viewModel = new PokemonsViewModel(
+            total: count($pokemonList),
+            pokemons: $this->pokemonService->paginate($pokemonList, $request->page ?? 1),
+        );
 
         return view('pokemons.index', $viewModel);
     }
@@ -29,14 +34,12 @@ class PokemonController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id): View
+    public function show(string $name): View
     {
-        if ($id > $this->pokemonService->getTotal())
-            return view('errors.404');
-
         $viewModel = new PokemonViewModel(
-            pokemon: $this->pokemonService->getOne($id),
-            total: $this->pokemonService->getTotal(),
+            pokemon: $this->pokemonService->getPokemon($name),
+            previous: $this->pokemonService->getPreviousPokemonName($name),
+            next: $this->pokemonService->getNextPokemonName($name),
         );
 
         return view('pokemons.show', $viewModel);

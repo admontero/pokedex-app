@@ -19,9 +19,9 @@ Route::get('/', [App\Http\Controllers\PokemonController::class, 'index'])
 Route::get('/pokemon/search', App\Http\Controllers\PokemonSearchController::class)
     ->name('pokemons.search');
 
-Route::get('/pokemon/{id}', [App\Http\Controllers\PokemonController::class, 'show'])
+Route::get('/pokemon/{name}', [App\Http\Controllers\PokemonController::class, 'show'])
     ->name('pokemons.show')
-    ->where('id', '[0-9]+');
+    ->where('name', '[a-zA-Z\-]+');
 
 Route::fallback(function () {
     abort(404);

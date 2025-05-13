@@ -13,7 +13,7 @@
             <h5 class="card-title text-capitalize pokemon-solid text-center">
                 <a
                     class="text-white text-decoration-none"
-                    href="{{ route('pokemons.show', $pokemon->id) }}"
+                    href="{{ route('pokemons.show', $pokemon->name) }}"
                 >
                     {{ $pokemon->name }}
                 </a>

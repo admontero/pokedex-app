@@ -15,8 +15,13 @@ class PokemonSearchController extends Controller
      */
     public function __invoke(PokemonSearchRequest $request, PokemonService $pokemonService): View
     {
+        session()->put('backUrl', route('pokemons.search', ['page' => 1, 'term' => $request->term, 'type' => $request->type]));
+
+        $pokemonList = $pokemonService->getAllBySearch(PokemonSearchDTO::fromRequest($request));
+
         $viewModel = new PokemonsViewModel(
-            pokemons: $pokemonService->getAllBySearch(PokemonSearchDTO::fromRequest($request))
+            total: count($pokemonList),
+            pokemons: $pokemonService->paginate($pokemonList, $request->page ?? 1)
         );
 
         return view('pokemons.search', $viewModel);

@@ -29,8 +29,8 @@ class PokemonSearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'nullable|required_without:type|string|min:3|max:30',
-            'type' => 'nullable|required_without:name|string',
+            'term' => 'nullable|required_without:type|string|max:30',
+            'type' => 'nullable|required_without:term|string',
         ];
     }
 
@@ -42,7 +42,7 @@ class PokemonSearchRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required_without' => 'El campo nombre es requerido si no selecciona un tipo',
+            'term.required_without' => 'El campo nombre es requerido si no selecciona un tipo',
         ];
     }
 }

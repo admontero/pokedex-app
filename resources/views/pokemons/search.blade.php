@@ -1,76 +1,71 @@
 <x-app-layout>
-    <div class="row mb-3">
+    <div class="row align-items-center mb-3">
         <div class="col-md-4">
             <a
                 class="btn btn-sm bg-pokemon-blue text-white d-inline-flex align-items-center"
                 href="javascript:window.history.back()"
                 role="button"
             >
-                <img src="https://img.icons8.com/office/30/000000/pokeball.png" class="me-2"/>
+                <i class="fa fa-arrow-left me-2"></i>
                 Volver
             </a>
             <hr class="d-md-none">
         </div>
         <div class="col-md-8">
-            <form action="{{ route('pokemons.search') }}" method="GET">
-                <div class="input-group shadow-sm">
-                    <span class="input-group-text" id="basic-addon1">
-                        <i class="fa fa-magnifying-glass"></i>
-                    </span>
-
-                    <input
-                        class="form-control @error('name') is-invalid @enderror"
-                        type="search"
-                        name="name"
-                        id="name"
-                        value="{{ old('name') }}"
-                        placeholder="Buscar pokémon. Ej: bulbasaur"
-                    />
-                </div>
-                @error('name')
-                    <div class="invalid-feedback d-block small">{{ $message }}</div>
-                @enderror
-            </form>
+            <x-pokemon.form-search />
         </div>
     </div>
 
-    <hr class="d-none d-md-block">
+    <div class="d-inline-block align-items-center gap-2 mb-3">
+        <h4 class="d-inline">
+            <span class="text-pokemon-red">{{ $total }}</span>
+            Resultados de la búsqueda:
+        </h4>
 
-    <h3>
-        <span class="text-pokemon-red">{{ $pokemons->count() }}</span>
-        resultados de la búsqueda:
-    </h3>
-
-    <p class="small">
-        <span class="fw-bold">Término:</span>
-        @if (request()->name)
-            <span class="text-pokemon-red">{{ request()->name }}</span>
-        @else
-            <span class="text-muted fst-italic">--</span>
+        @if (request()->term)
+            <h5 class="d-inline"><span class="badge bg-white text-black px-2.5 py-1.5 shadow-lg border ms-2">{{ request()->term }}</span></h5>
         @endif
 
-        <span class="mx-2">/</span>
-
-        <span class="fw-bold">Tipo:</span>
         @if (request()->type)
-            <span class="badge {{ request()->type }} fw-semibold px-2 py-1 text-capitalize shadow-lg">
-                {{ request()->type }}
-            </span>
-        @else
-            <span class="text-muted fst-italic">--</span>
+            <h5 class="d-inline ms-1">
+                <span class="badge {{ request()->type }} fw-semibold px-2.5 py-1.5 text-capitalize shadow-lg">
+                    {{ request()->type }}
+                </span>
+            </h5>
         @endif
-    </p>
+    </div>
 
-    <hr>
+    @if (count($pokemons))
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2" id="main-content">
+            @foreach ($pokemons as $pokemon)
+                <x-pokemon.card :$pokemon />
+            @endforeach
+        </div>
+    @else
+        <p class="text-center fst-italic mt-4">
+            No existen pokémon según sus criterios de búsqueda. Inténtelo con otros.
+        </p>
+    @endif
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2">
-        @foreach ($pokemons as $pokemon)
-            <x-pokemon-card :$pokemon />
-        @endforeach
+
+    <div class="my-5">
+        <x-infinite-scroller />
     </div>
 
     @push('scripts')
         <script>
+            let elem = document.querySelector('#main-content');
+
+            let infScroll = new InfiniteScroll(elem, {
+                path: "/pokemon/search/?page=@{{#}}&term={{ request()->get('term') ?? '' }}&type={{ request()->get('type') ?? '' }}",
+                append: '.col',
+                status: '.page-load-status',
+            });
+
+            infScroll.on('append', function(body, path, items, response) {
+                initElements(items)
+            })
+
             const initElements = function (items) {
                 items.forEach(function (el) {
                     el.addEventListener('click', function () {

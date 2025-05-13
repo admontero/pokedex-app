@@ -8,6 +8,7 @@ use Spatie\ViewModels\ViewModel;
 class PokemonsViewModel extends ViewModel
 {
     public function __construct(
+        public int $total,
         public array $pokemons,
     ){}
 
@@ -15,8 +16,8 @@ class PokemonsViewModel extends ViewModel
     {
         $pokemons = collect($this->pokemons)->map(function ($pokemon) {
             return (object) [
-                'id' => $pokemon['id'] ?? null,
-                'name' => $pokemon['name'] ?? null,
+                'id' => $pokemon['id'],
+                'name' => $pokemon['name'],
                 'image' => $pokemon['sprites']['other']['official-artwork']['front_default'] ?? 'https://placehold.co/300x300/white/lightgray?text=NOT+FOUND',
                 'types' => isset($pokemon['types']) ? collect($pokemon['types'])->map(fn ($type) => $type['type']['name']) : collect(),
             ];
