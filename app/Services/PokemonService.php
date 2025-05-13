@@ -57,7 +57,8 @@ class PokemonService extends ClientService
     {
         $cacheKey = 'POKEMON_LIST=';
 
-        $cacheKey .= collect($dto)->sortKeys()->each(fn ($value, $key) => "{$key}:{$value},");
+        $cacheKey .= collect(get_object_vars($dto))
+            ->each(fn ($value, $key) => "{$key}:{$value},");
 
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
