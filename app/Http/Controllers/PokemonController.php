@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PokemonIndexRequest;
 use App\Services\PokemonService;
-use App\ViewModels\PokemonsViewModel;
+use App\ViewModels\PokemonListViewModel;
 use App\ViewModels\PokemonViewModel;
 use Illuminate\View\View;
 
@@ -23,7 +23,7 @@ class PokemonController extends Controller
 
         $pokemonList = $this->pokemonService->getAllPokemon();
 
-        $viewModel = new PokemonsViewModel(
+        $viewModel = new PokemonListViewModel(
             total: count($pokemonList),
             pokemons: $this->pokemonService->paginate($pokemonList, $request->page ?? 1),
         );

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\DTOs\PokemonSearchDTO;
 use App\Http\Requests\PokemonSearchRequest;
 use App\Services\PokemonService;
-use App\ViewModels\PokemonsViewModel;
+use App\ViewModels\PokemonListViewModel;
 use Illuminate\View\View;
 
 class PokemonSearchController extends Controller
@@ -19,7 +19,7 @@ class PokemonSearchController extends Controller
 
         $pokemonList = $pokemonService->getAllBySearch(PokemonSearchDTO::fromRequest($request));
 
-        $viewModel = new PokemonsViewModel(
+        $viewModel = new PokemonListViewModel(
             total: count($pokemonList),
             pokemons: $pokemonService->paginate($pokemonList, $request->page ?? 1)
         );

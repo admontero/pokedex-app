@@ -2,7 +2,7 @@
     <div class="row align-items-center mb-3">
         <div class="col-md-4">
             <a
-                class="btn btn-sm bg-pokemon-blue text-white d-inline-flex align-items-center"
+                class="btn btn-sm btn-secondary text-white d-inline-flex align-items-center"
                 href="{{ session()->get('backUrl') ?? route('pokemons.index') }}"
                 role="button"
             >
@@ -16,16 +16,16 @@
         </div>
     </div>
 
-    <div class="row mb-0 mb-md-2">
-        <div class="col-md-4">
+    <div class="row -0 mb-md-2">
+        <div class="col-md-4 order-1 order-md-0">
             <h5 class="text-capitalize text-center text-white pokemon-solid bg-dark rounded pt-1 pb-3 mb-0">
                 {{ $pokemon->name }}
             </h5>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8 order-0 order-md-1">
             <div class="d-flex justify-content-between align-items-center h-100">
                 <a
-                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ !$previous ? 'disabled' : '' }}"
+                    class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center {{ !$previous ? 'disabled' : '' }}"
                     href="{{ $previous ? route('pokemons.show', $previous) : '#' }}"
                     role="button"
                 >
@@ -34,7 +34,7 @@
                 </a>
 
                 <a
-                    class="btn btn-sm bg-pokemon-red text-white d-inline-flex align-items-center {{ !$next ? 'disabled' : '' }}"
+                    class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center {{ !$next ? 'disabled' : '' }}"
                     href="{{ $next ? route('pokemons.show', $next) : '#' }}"
                     role="button"
                 >
@@ -87,13 +87,13 @@
                     {{-- <div class="mb-2">
                         <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Habilidades</h6>
                         <div>
-                            {{ $pokemon->abilities->implode(', ') }}
+                            {{ $pokemon->abilities }}
                         </div>
                     </div>
                     <div class="mb-2">
                         <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Items</h6>
                         <div>
-                            {{ $pokemon->items->implode(', ') }}
+                            {{ $pokemon->items }}
                         </div>
                     </div> --}}
                 </div>

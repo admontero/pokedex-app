@@ -7,11 +7,11 @@
     </div>
 
     <div class="row align-items-center py-3">
-        <div class="col-4">
+        <div class="col-md-4 mb-2 mb-md-0">
             <p class="d-inline"><span class="text-danger fw-bold">{{ $total }}</span> Resultados</p>
         </div>
 
-        <div class="col-8">
+        <div class="col-md-8">
             <x-pokemon.form-search />
         </div>
     </div>
@@ -37,7 +37,7 @@
             let elem = document.querySelector('#main-content');
 
             let infScroll = new InfiniteScroll(elem, {
-                path: '/?page=@{{#}}',
+                path: '?page=@{{#}}',
                 append: '.col',
                 status: '.page-load-status',
             });

@@ -63,30 +63,38 @@ class PokemonViewModel extends ViewModel
         return $this->pokemon['base_experience'] ?? '--';
     }
 
-    protected function formatTypes(): Collection
+    protected function formatTypes(): array
     {
-        if (! isset($this->pokemon['types'])) return collect();
+        if (! isset($this->pokemon['types'])) return [];
 
-        return collect($this->pokemon['types'])->map(fn($type) => $type['type']['name']);
+        return collect($this->pokemon['types'])
+            ->map(fn($type) => $type['type']['name'])
+            ->all();
     }
 
     protected function formatAbilities(): string
     {
-        if (! isset($this->pokemon['abilities'])) return '--';
+        if (! isset($this->pokemon['abilities']) || empty($this->pokemon['abilities'])) return '--';
 
-        return collect($this->pokemon['abilities'])->map(fn($type) => str_replace('-', ' ', $type['ability']['name']));
+        $abilities = collect($this->pokemon['abilities'])
+            ->map(fn($type) => ucfirst(str_replace('-', ' ', $type['ability']['name'])));
+
+        return implode(' - ', $abilities->all());
     }
 
     protected function formatItems(): string
     {
-        if (! isset($this->pokemon['held_items'])) return '--';
+        if (! isset($this->pokemon['held_items']) || empty($this->pokemon['held_items'])) return '--';
 
-        return collect($this->pokemon['held_items'])->map(fn($type) => str_replace('-', ' ', $type['item']['name']));
+        $items = collect($this->pokemon['held_items'])
+            ->map(fn($type) => ucfirst(str_replace('-', ' ', $type['item']['name'])));
+
+        return implode(' - ', $items->all());
     }
 
-    protected function formatStats(): Collection
+    protected function formatStats(): array
     {
-        if (! isset($this->pokemon['stats'])) return collect();
+        if (! isset($this->pokemon['stats'])) return [];
 
         return collect($this->pokemon['stats'])
             ->map(function ($stat) {
@@ -95,12 +103,13 @@ class PokemonViewModel extends ViewModel
                     'value' => $stat['base_stat'],
                     'percentage' => ($stat['base_stat'] * 100) / 255,
                 ];
-            });
+            })
+            ->all();
     }
 
     protected function formatSprites(): Collection
     {
-        if (! isset($this->pokemon['sprites'])) return collect();
+        if (! isset($this->pokemon['sprites'])) return collect([]);
 
         return collect($this->pokemon['sprites'])
             ->only('back_default', 'back_shiny', 'front_default', 'front_shiny')
@@ -116,7 +125,7 @@ class PokemonViewModel extends ViewModel
 
     protected function formatFemaleSprites(): Collection
     {
-        if (! isset($this->pokemon['sprites'])) return collect();
+        if (! isset($this->pokemon['sprites'])) return collect([]);
 
         return collect($this->pokemon['sprites'])
             ->only('back_female', 'back_shiny_female', 'front_female', 'front_shiny_female')

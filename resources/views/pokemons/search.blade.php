@@ -2,8 +2,8 @@
     <div class="row align-items-center mb-3">
         <div class="col-md-4">
             <a
-                class="btn btn-sm bg-pokemon-blue text-white d-inline-flex align-items-center"
-                href="javascript:window.history.back()"
+                class="btn btn-sm btn-secondary text-white d-inline-flex align-items-center"
+                href="{{ route('pokemons.index') }}"
                 role="button"
             >
                 <i class="fa fa-arrow-left me-2"></i>
@@ -57,7 +57,7 @@
             let elem = document.querySelector('#main-content');
 
             let infScroll = new InfiniteScroll(elem, {
-                path: "/pokemon/search/?page=@{{#}}&term={{ request()->get('term') ?? '' }}&type={{ request()->get('type') ?? '' }}",
+                path: "/pokemon/search?page=@{{#}}&term={{ request()->get('term') ?? '' }}&type={{ request()->get('type') ?? '' }}",
                 append: '.col',
                 status: '.page-load-status',
             });

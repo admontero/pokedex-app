@@ -26,7 +26,13 @@ abstract class ClientService
 
     protected function fetch(string $url): array
     {
-        $response = $this->client->get($url);
+        try {
+            $response = $this->client->get($url);
+        } catch (\Exception $e) {
+            Log::error('Error constructing URL: ' . $e->getMessage());
+
+            throw new PokemonRequestException('Error constructing URL: ' . $e->getMessage());
+        }
 
         if ($response->getStatusCode() === 404) {
             throw new PokemonNotFoundException('Pokemon not found');
