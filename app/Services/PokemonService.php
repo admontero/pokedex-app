@@ -42,7 +42,7 @@ class PokemonService extends ClientService
 
     public function getAllPokemon(): array
     {
-        $url = 'pokemon?limit=-1';
+        $url = "pokemon?limit={$this->getTotal()}";
 
         $results = Cache::remember('POKEMON_LIST', 60 * 60, function () use ($url) {
             ['results' => $results] = $this->fetch($url);
@@ -73,6 +73,19 @@ class PokemonService extends ClientService
         Cache::put($cacheKey, $data, 60 * 60);
 
         return $data;
+    }
+
+    public function getTotal(): int
+    {
+        $url = 'pokemon?limit=1';
+
+        $total = Cache::remember('POKEMON_TOTAL', 60 * 60, function () use ($url) {
+            ['count' => $count] = $this->fetch($url);
+
+            return $count;
+        });
+
+        return $total;
     }
 
     public function paginate(array $data = [], int $page = 1, int $perPage = 16): array
