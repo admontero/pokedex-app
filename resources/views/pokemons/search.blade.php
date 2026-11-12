@@ -48,47 +48,19 @@
     @endif
 
 
+    @php
+        $searchPath = str_replace(
+            '__PAGE__',
+            '{{#}}',
+            route('pokemons.search', [
+                'page' => '__PAGE__',
+                'term' => request()->get('term'),
+                'type' => request()->get('type'),
+            ])
+        );
+    @endphp
+
     <div class="my-5">
-        <x-infinite-scroller />
+        <x-infinite-scroller :path="$searchPath" />
     </div>
-
-    @push('scripts')
-        @php
-            $searchPath = str_replace(
-                '__PAGE__',
-                '{{#}}',
-                route('pokemons.search', [
-                    'page' => '__PAGE__',
-                    'term' => request()->get('term'),
-                    'type' => request()->get('type'),
-                ])
-            );
-        @endphp
-
-        <script>
-            let elem = document.querySelector('#main-content');
-
-            let infScroll = new InfiniteScroll(elem, {
-                path: @json($searchPath),
-                append: '.col',
-                status: '.page-load-status',
-            });
-
-            infScroll.on('append', function(body, path, items, response) {
-                initElements(items)
-            })
-
-            const initElements = function (items) {
-                items.forEach(function (el) {
-                    el.addEventListener('click', function () {
-                        el.querySelector('a').click()
-                    })
-                })
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                initElements(document.querySelectorAll('.card'))
-            })
-        </script>
-    @endpush
 </x-app-layout>

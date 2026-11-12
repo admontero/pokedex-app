@@ -16,6 +16,10 @@
         </div>
     </div>
 
+    @php
+        $path = '?page={{#}}';
+    @endphp
+
     @if (count($pokemons))
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-2" id="main-content">
             @foreach ($pokemons as $pokemon)
@@ -29,34 +33,6 @@
     @endif
 
     <div class="my-5">
-        <x-infinite-scroller />
+        <x-infinite-scroller :path="$path" />
     </div>
-
-    @push('scripts')
-        <script>
-            let elem = document.querySelector('#main-content');
-
-            let infScroll = new InfiniteScroll(elem, {
-                path: '?page=@{{#}}',
-                append: '.col',
-                status: '.page-load-status',
-            });
-
-            infScroll.on('append', function(body, path, items, response) {
-                initElements(items)
-            })
-
-            const initElements = function(items) {
-                items.forEach(function(el) {
-                    el.addEventListener('click', function() {
-                        el.querySelector('a').click()
-                    })
-                })
-            }
-
-            document.addEventListener('DOMContentLoaded', function() {
-                initElements(document.querySelectorAll('.card'))
-            })
-        </script>
-    @endpush
 </x-app-layout>

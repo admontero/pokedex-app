@@ -104,6 +104,10 @@
     display: none;
 }
 
+.pokemon-card-image {
+    max-width: 260px;
+}
+
 .pokemon-card:hover {
     cursor: pointer;
 }
