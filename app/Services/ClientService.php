@@ -29,8 +29,9 @@ abstract class ClientService
         public string $baseUrl,
         public array $headers = [],
         public bool $withErrorHandler = true,
+        ?callable $handler = null,
     ) {
-        $stack = HandlerStack::create();
+        $stack = HandlerStack::create($handler);
         $stack->push(Middleware::retry(
             $this->shouldRetry(),
             static fn (int $retries): int => 100 * (2 ** ($retries - 1)),

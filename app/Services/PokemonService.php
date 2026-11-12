@@ -16,7 +16,7 @@ class PokemonService extends ClientService
 
     private const LOCK_WAIT_SECONDS = 15;
 
-    public function __construct()
+    public function __construct(?callable $handler = null)
     {
         parent::__construct(
             baseUrl: config('services.pokemon.base_url'),
@@ -25,6 +25,7 @@ class PokemonService extends ClientService
                 'Accept-Encoding' => 'gzip, deflate',
             ],
             withErrorHandler: false,
+            handler: $handler,
         );
     }
 
