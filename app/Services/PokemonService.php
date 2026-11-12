@@ -13,8 +13,7 @@ class PokemonService
     public function __construct(
         private PokemonRepository $repository,
         private PokemonSearch $search,
-    ) {
-    }
+    ) {}
 
     public function getAllPokemon(): array
     {

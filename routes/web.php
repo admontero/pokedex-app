@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PokemonController;
+use App\Http\Controllers\PokemonSearchController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,13 +15,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [App\Http\Controllers\PokemonController::class, 'index'])
+Route::get('/', [PokemonController::class, 'index'])
     ->name('pokemons.index');
 
-Route::get('/pokemon/search', App\Http\Controllers\PokemonSearchController::class)
+Route::get('/pokemon/search', PokemonSearchController::class)
     ->name('pokemons.search');
 
-Route::get('/pokemon/{name}', [App\Http\Controllers\PokemonController::class, 'show'])
+Route::get('/pokemon/{name}', [PokemonController::class, 'show'])
     ->name('pokemons.show')
     ->where('name', '[a-zA-Z\-]+');
 

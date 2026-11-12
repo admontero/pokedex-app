@@ -6,9 +6,7 @@ use App\DTOs\PokemonSearchDTO;
 
 class PokemonSearch
 {
-    public function __construct(private PokemonRepository $repository)
-    {
-    }
+    public function __construct(private PokemonRepository $repository) {}
 
     public function apply(PokemonSearchDTO $dto): array
     {

@@ -9,8 +9,7 @@ class PokemonSearchDTO
     public function __construct(
         public readonly ?string $term,
         public readonly ?string $type,
-    ) {
-    }
+    ) {}
 
     public static function fromRequest(PokemonSearchRequest $request): self
     {

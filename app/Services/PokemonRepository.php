@@ -13,9 +13,7 @@ class PokemonRepository
 
     private const LOCK_WAIT_SECONDS = 15;
 
-    public function __construct(private PokeApiClient $client)
-    {
-    }
+    public function __construct(private PokeApiClient $client) {}
 
     /**
      * @return array<int, array{name: string, url: string}>
