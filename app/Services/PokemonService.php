@@ -7,27 +7,6 @@ use Illuminate\Support\Facades\Cache;
 
 class PokemonService extends ClientService
 {
-    public const TYPES = [
-        'normal',
-        'fighting',
-        'flying',
-        'poison',
-        'ground',
-        'rock',
-        'bug',
-        'ghost',
-        'steel',
-        'fire',
-        'water',
-        'grass',
-        'electric',
-        'psychic',
-        'ice',
-        'dragon',
-        'dark',
-        'fairy',
-    ];
-
     public function __construct()
     {
         parent::__construct(
@@ -88,8 +67,10 @@ class PokemonService extends ClientService
         return $total;
     }
 
-    public function paginate(array $data = [], int $page = 1, int $perPage = 16): array
+    public function paginate(array $data = [], int $page = 1, ?int $perPage = null): array
     {
+        $perPage ??= (int) config('pokemon.per_page', 16);
+
         $paginatedPokemons = collect($data)
             ->skip($perPage * ($page - 1))
             ->take($perPage);

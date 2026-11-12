@@ -19,7 +19,7 @@ class PokemonListViewModel extends ViewModel
                 return (object) [
                     'id' => $pokemon['id'],
                     'name' => $pokemon['name'],
-                    'image' => $pokemon['sprites']['other']['official-artwork']['front_default'] ?? 'https://placehold.co/300x300/white/lightgray?text=NOT+FOUND',
+                    'image' => $pokemon['sprites']['other']['official-artwork']['front_default'] ?? config('pokemon.placeholder'),
                     'types' => isset($pokemon['types']) ? collect($pokemon['types'])
                         ->map(fn ($type) => $type['type']['name'])
                         ->all() : [],

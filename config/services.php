@@ -32,7 +32,7 @@ return [
     ],
 
     'pokemon' => [
-        'base_url' => env('POKEMON_BASE_URL'),
+        'base_url' => env('POKEMON_BASE_URL', 'https://pokeapi.co/api/v2/'),
     ],
 
 ];

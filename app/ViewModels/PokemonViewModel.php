@@ -46,7 +46,7 @@ class PokemonViewModel extends ViewModel
 
     protected function formatImage(): string
     {
-        return $this->pokemon['sprites']['other']['official-artwork']['front_default'] ?? 'https://placehold.co/300x300/white/lightgray?text=NOT+FOUND';
+        return $this->pokemon['sprites']['other']['official-artwork']['front_default'] ?? config('pokemon.placeholder');
     }
 
     protected function formatWeight(): string
@@ -128,7 +128,7 @@ class PokemonViewModel extends ViewModel
                 return (object) [
                     $key => (object) [
                         'name' => ucfirst(str_replace('_', ' ', $key)),
-                        'image' => $item ?? 'https://placehold.co/90x90/white/lightgray?text=NOT+FOUND',
+                        'image' => $item ?? config('pokemon.sprite_placeholder'),
                     ],
                 ];
             });
@@ -147,7 +147,7 @@ class PokemonViewModel extends ViewModel
                 return (object) [
                     $key => (object) [
                         'name' => ucfirst(str_replace(' female', '', str_replace('_', ' ', $key))),
-                        'image' => $item ?? 'https://placehold.co/90x90/white/lightgray?text=NOT+FOUND',
+                        'image' => $item ?? config('pokemon.sprite_placeholder'),
                     ],
                 ];
             });

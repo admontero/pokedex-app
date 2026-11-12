@@ -12,7 +12,7 @@
         <div class="col-lg-3 mb-1 mb-lg-0">
             <select name="type" class="form-select text-capitalize" aria-label="Default select example">
                 <option selected value="">tipo</option>
-                @foreach (App\Services\PokemonService::TYPES as $type)
+                @foreach (config('pokemon.types') as $type)
                     <option class="text-capitalize" value="{{ $type }}" @selected(old('type', request()->type) == $type)>{{ $type }}</option>
                 @endforeach
             </select>

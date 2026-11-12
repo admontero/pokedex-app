@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PokemonSearchRequest extends FormRequest
 {
@@ -30,7 +31,7 @@ class PokemonSearchRequest extends FormRequest
     {
         return [
             'term' => 'nullable|required_without:type|string|max:30',
-            'type' => 'nullable|required_without:term|string',
+            'type' => ['nullable', 'required_without:term', 'string', Rule::in(config('pokemon.types'))],
             'page' => 'nullable|integer|min:1',
         ];
     }
