@@ -13,9 +13,14 @@ class PokemonSearchDTO
 
     public static function fromRequest(PokemonSearchRequest $request): self
     {
+        $validated = $request->validated();
+
+        $term = $validated['term'] ?? null;
+        $type = $validated['type'] ?? null;
+
         return new self(
-            term: $request->safe()->term ? strtolower($request->safe()->term) : null,
-            type: $request->safe()->type ? strtolower($request->safe()->type) : null,
+            term: $term ? strtolower($term) : null,
+            type: $type ? strtolower($type) : null,
         );
     }
 }
