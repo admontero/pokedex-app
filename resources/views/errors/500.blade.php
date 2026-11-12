@@ -1,3 +1,7 @@
+@php
+    $detail = $message ?? (isset($exception) ? $exception->getMessage() : null);
+@endphp
+
 <x-app-layout>
     <div class="pt-4">
         <img src="{{ asset('vendor/images/500.png') }}" class="img-fluid d-block mx-auto" style="max-width: 300px;" />
@@ -7,7 +11,12 @@
                 <div class="alert alert-danger lead" role="alert">
                     <span class="fw-semibold">Error</span>
                     <hr>
-                    {{ $exception->getMessage() }}
+                    No pudimos completar la solicitud. Inténtalo de nuevo en unos momentos.
+
+                    @if (config('app.debug') && $detail)
+                        <hr>
+                        <small class="d-block text-start text-muted">{{ $detail }}</small>
+                    @endif
                 </div>
             </div>
         </div>
