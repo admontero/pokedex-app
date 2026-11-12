@@ -53,11 +53,23 @@
     </div>
 
     @push('scripts')
+        @php
+            $searchPath = str_replace(
+                '__PAGE__',
+                '{{#}}',
+                route('pokemons.search', [
+                    'page' => '__PAGE__',
+                    'term' => request()->get('term'),
+                    'type' => request()->get('type'),
+                ])
+            );
+        @endphp
+
         <script>
             let elem = document.querySelector('#main-content');
 
             let infScroll = new InfiniteScroll(elem, {
-                path: "/pokemon/search?page=@{{#}}&term={{ request()->get('term') ?? '' }}&type={{ request()->get('type') ?? '' }}",
+                path: @json($searchPath),
                 append: '.col',
                 status: '.page-load-status',
             });
