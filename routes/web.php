@@ -26,4 +26,3 @@ Route::get('/pokemon/{name}', [App\Http\Controllers\PokemonController::class, 's
 Route::fallback(function () {
     abort(404);
 });
-

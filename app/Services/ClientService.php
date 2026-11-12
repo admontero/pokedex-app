@@ -81,9 +81,9 @@ abstract class ClientService
         try {
             $response = $this->client->get($url);
         } catch (\Exception $e) {
-            Log::error('Error constructing URL: ' . $e->getMessage());
+            Log::error('Error constructing URL: '.$e->getMessage());
 
-            throw new PokemonRequestException('Error constructing URL: ' . $e->getMessage());
+            throw new PokemonRequestException('Error constructing URL: '.$e->getMessage());
         }
 
         if ($response->getStatusCode() === 404) {
@@ -91,13 +91,13 @@ abstract class ClientService
         }
 
         if ($response->getStatusCode() !== 200) {
-            Log::error('Error fetching data from URL: ' . $url, [
+            Log::error('Error fetching data from URL: '.$url, [
                 'status_code' => $response->getStatusCode(),
                 'body' => $response->getBody()->getContents(),
             ]);
 
             throw new PokemonRequestException(
-                'Error fetching data from URL: ' . $url,
+                'Error fetching data from URL: '.$url,
                 $response->getStatusCode(),
             );
         }
@@ -120,12 +120,12 @@ abstract class ClientService
             if ($response['state'] === 'fulfilled') {
                 $results[$key] = json_decode($response['value']->getBody()->getContents(), true);
             } else {
-                Log::error('Error fetching data from URL: ' . $urls[$key], [
+                Log::error('Error fetching data from URL: '.$urls[$key], [
                     'exception' => $response['reason'],
                 ]);
 
                 throw new PokemonRequestException(
-                    'Error fetching data from URL: ' . $urls[$key],
+                    'Error fetching data from URL: '.$urls[$key],
                     502,
                 );
             }

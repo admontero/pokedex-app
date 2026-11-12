@@ -156,7 +156,7 @@ class PokemonService extends ClientService
     {
         $url = "type/{$dto->type}";
 
-        [ 'pokemon' => $pokemons ] = $this->fetch($url);
+        ['pokemon' => $pokemons] = $this->fetch($url);
 
         $results = collect($pokemons)
             ->map(fn ($pokemon) => $pokemon['pokemon'])

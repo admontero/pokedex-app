@@ -12,7 +12,8 @@ class PokemonController extends Controller
 {
     public function __construct(
         public PokemonService $pokemonService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of the resource.
