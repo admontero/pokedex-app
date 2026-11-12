@@ -19,13 +19,15 @@ class PokemonController extends Controller
      */
     public function index(PokemonIndexRequest $request): View
     {
-        session()->put('backUrl', route('pokemons.index', ['page' => $request->page ?? 1]));
+        $page = (int) $request->validated('page', 1);
+
+        session()->put('backUrl', route('pokemons.index', ['page' => $page]));
 
         $pokemonList = $this->pokemonService->getAllPokemon();
 
         $viewModel = new PokemonListViewModel(
             total: count($pokemonList),
-            pokemons: $this->pokemonService->paginate($pokemonList, $request->page ?? 1),
+            pokemons: $this->pokemonService->paginate($pokemonList, $page),
         );
 
         return view('pokemons.index', $viewModel);

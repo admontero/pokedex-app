@@ -22,7 +22,7 @@ class PokemonIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'page' => 'nullable|integer',
+            'page' => 'nullable|integer|min:1',
         ];
     }
 }

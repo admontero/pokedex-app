@@ -31,6 +31,7 @@ class PokemonSearchRequest extends FormRequest
         return [
             'term' => 'nullable|required_without:type|string|max:30',
             'type' => 'nullable|required_without:term|string',
+            'page' => 'nullable|integer|min:1',
         ];
     }
 
