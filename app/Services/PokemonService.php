@@ -3,10 +3,19 @@
 namespace App\Services;
 
 use App\DTOs\PokemonSearchDTO;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 
 class PokemonService extends ClientService
 {
+    private const CACHE_PREFIX = 'pokemon:';
+
+    private const LIST_CACHE_KEY = self::CACHE_PREFIX.'list';
+
+    private const LOCK_SECONDS = 60;
+
+    private const LOCK_WAIT_SECONDS = 15;
+
     public function __construct()
     {
         parent::__construct(
@@ -21,50 +30,22 @@ class PokemonService extends ClientService
 
     public function getAllPokemon(): array
     {
-        $url = "pokemon?limit={$this->getTotal()}";
+        return $this->remember(self::LIST_CACHE_KEY, function (): array {
+            $response = $this->fetch('pokemon?limit=100000');
 
-        $results = Cache::remember('POKEMON_LIST', 60 * 60, function () use ($url) {
-            ['results' => $results] = $this->fetch($url);
-
-            return $results;
+            return $response['results'] ?? [];
         });
-
-        return $results;
     }
 
     public function getAllBySearch(PokemonSearchDTO $dto): array
     {
-        $cacheKey = 'POKEMON_LIST=';
-
-        $cacheKey .= collect(get_object_vars($dto))
-            ->each(fn ($value, $key) => "{$key}:{$value},");
-
-        if (Cache::has($cacheKey)) {
-            return Cache::get($cacheKey);
-        }
-
-        $data = match (true) {
-            ! empty($dto->type) => $this->filterByType($dto),
-            empty($dto->type) => $this->filterByTerm($dto->term),
-            default => [],
-        };
-
-        Cache::put($cacheKey, $data, 60 * 60);
-
-        return $data;
-    }
-
-    public function getTotal(): int
-    {
-        $url = 'pokemon?limit=1';
-
-        $total = Cache::remember('POKEMON_TOTAL', 60 * 60, function () use ($url) {
-            ['count' => $count] = $this->fetch($url);
-
-            return $count;
-        });
-
-        return $total;
+        return $this->remember(
+            $this->searchCacheKey($dto),
+            fn (): array => match (true) {
+                ! empty($dto->type) => $this->filterByType($dto),
+                default => $this->filterByTerm($dto->term),
+            },
+        );
     }
 
     public function paginate(array $data = [], int $page = 1, ?int $perPage = null): array
@@ -75,21 +56,26 @@ class PokemonService extends ClientService
             ->skip($perPage * ($page - 1))
             ->take($perPage);
 
-        $pokemonData = $paginatedPokemons
-            ->filter(fn ($pokemon) => Cache::has($this->getCacheKeyByPokemonName($pokemon['name'])))
-            ->map(fn ($pokemon) => Cache::get($this->getCacheKeyByPokemonName($pokemon['name'])))
-            ->all();
+        $pokemonData = [];
+        $pokemonUrls = [];
 
-        $pokemonUrls = $paginatedPokemons
-            ->filter(fn ($pokemon) => ! Cache::has($this->getCacheKeyByPokemonName($pokemon['name'])))
-            ->pluck('url')
-            ->all();
+        foreach ($paginatedPokemons as $pokemon) {
+            $cached = Cache::get($this->pokemonCacheKey($pokemon['name']));
 
-        $pokemonData = [...$pokemonData, ...$this->fetchMultiple($pokemonUrls)];
+            if ($cached !== null) {
+                $pokemonData[] = $cached;
+            } else {
+                $pokemonUrls[] = $pokemon['url'];
+            }
+        }
 
-        collect($pokemonData)
-            ->filter(fn ($pokemon) => ! Cache::has($this->getCacheKeyByPokemonName($pokemon['name'])))
-            ->each(fn ($pokemon) => Cache::put($this->getCacheKeyByPokemonName($pokemon['name']), $pokemon, 60 * 60));
+        if ($pokemonUrls !== []) {
+            foreach ($this->fetchMultiple($pokemonUrls) as $pokemon) {
+                Cache::put($this->pokemonCacheKey($pokemon['name']), $pokemon, $this->cacheTtl());
+
+                $pokemonData[] = $pokemon;
+            }
+        }
 
         usort($pokemonData, fn ($a, $b) => $a['id'] <=> $b['id']);
 
@@ -98,13 +84,10 @@ class PokemonService extends ClientService
 
     public function getPokemon(string $name): array
     {
-        $pokemon = Cache::remember($this->getCacheKeyByPokemonName($name), 60 * 60, function () use ($name) {
-            $data = $this->fetch("pokemon/{$name}");
-
-            return $data;
-        });
-
-        return $pokemon;
+        return $this->remember(
+            $this->pokemonCacheKey($name),
+            fn (): array => $this->fetch("pokemon/{$name}"),
+        );
     }
 
     public function getNextPokemonName(string $name): ?string
@@ -133,7 +116,7 @@ class PokemonService extends ClientService
         return $previousPokemon['name'] ?? null;
     }
 
-    private function filterByType(PokemonSearchDTO $dto)
+    private function filterByType(PokemonSearchDTO $dto): array
     {
         $url = "type/{$dto->type}";
 
@@ -147,20 +130,53 @@ class PokemonService extends ClientService
             $results = array_filter($results, fn ($pokemon) => str_contains($pokemon['name'], $dto->term));
         }
 
-        return $results;
+        return array_values($results);
     }
 
-    private function filterByTerm(string $term): array
+    private function filterByTerm(?string $term): array
     {
         $pokemonList = $this->getAllPokemon();
 
-        $results = array_filter($pokemonList, fn ($pokemon) => str_contains($pokemon['name'], $term));
+        $results = array_filter(
+            $pokemonList,
+            fn ($pokemon) => str_contains($pokemon['name'], (string) $term),
+        );
 
-        return $results;
+        return array_values($results);
     }
 
-    protected function getCacheKeyByPokemonName(string $name): string
+    /**
+     * Cache the callback result, computing it only once even if several
+     * requests miss the cache at the same time (cache stampede).
+     */
+    private function remember(string $key, callable $callback): array
     {
-        return "POKEMON:name={$name}";
+        if (($cached = Cache::get($key)) !== null) {
+            return $cached;
+        }
+
+        try {
+            return Cache::lock("{$key}:lock", self::LOCK_SECONDS)
+                ->block(self::LOCK_WAIT_SECONDS, fn () => Cache::remember($key, $this->cacheTtl(), $callback));
+        } catch (LockTimeoutException) {
+            // Another worker is taking too long; answer with fresh data
+            // instead of failing the request.
+            return Cache::remember($key, $this->cacheTtl(), $callback);
+        }
+    }
+
+    private function cacheTtl(): int
+    {
+        return (int) config('pokemon.cache_ttl', 3600);
+    }
+
+    private function searchCacheKey(PokemonSearchDTO $dto): string
+    {
+        return sprintf('%ssearch:%s:%s', self::CACHE_PREFIX, $dto->type ?? '-', $dto->term ?? '-');
+    }
+
+    private function pokemonCacheKey(string $name): string
+    {
+        return self::CACHE_PREFIX."name:{$name}";
     }
 }
