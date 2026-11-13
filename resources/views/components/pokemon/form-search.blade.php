@@ -22,7 +22,7 @@
         </div>
     @endif
 
-    <div class="row g-2 align-items-end justify-content-center">
+    <div class="row g-2 align-items-start justify-content-center">
         <div class="col-lg-7 mb-1 mb-lg-0">
             <label class="form-label" for="term">Nombre o número</label>
 
@@ -67,6 +67,8 @@
         </div>
 
         <div class="col-lg-2">
+            <div class="form-label d-none d-lg-block" aria-hidden="true">&nbsp;</div>
+
             <div class="d-grid">
                 <button class="btn btn-pokemon-red d-inline-flex align-items-center justify-content-center" type="submit" data-search-submit>
                     <span class="spinner-border spinner-border-sm me-2 d-none" data-search-spinner aria-hidden="true"></span>
