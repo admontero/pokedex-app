@@ -17,13 +17,24 @@ class PokemonListViewModel extends ViewModel
     {
         $pokemons = collect($this->pokemons)
             ->map(function ($pokemon) {
+                $types = $pokemon['types'] ?? [];
+
+                // The repository caches list cards with type names, but full
+                // payloads (tests, legacy cache entries) keep the nested shape.
+                if (isset($types[0]) && is_array($types[0])) {
+                    $types = collect($types)
+                        ->map(fn ($type) => $type['type']['name'] ?? '')
+                        ->filter()
+                        ->all();
+                }
+
                 return (object) [
-                    'id' => $pokemon['id'],
-                    'name' => $pokemon['name'],
-                    'image' => $pokemon['sprites']['other']['official-artwork']['front_default'] ?? config('pokemon.placeholder'),
-                    'types' => isset($pokemon['types']) ? collect($pokemon['types'])
-                        ->map(fn ($type) => $type['type']['name'])
-                        ->all() : [],
+                    'id' => $pokemon['id'] ?? null,
+                    'name' => $pokemon['name'] ?? '',
+                    'image' => $pokemon['image']
+                        ?? $pokemon['sprites']['other']['official-artwork']['front_default']
+                        ?? config('pokemon.placeholder'),
+                    'types' => array_values($types),
                 ];
             })
             ->all();

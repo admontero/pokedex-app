@@ -31,7 +31,16 @@ trait FakesPokeApi
         return [
             'id' => $id,
             'name' => $name,
+            'weight' => 69,
+            'height' => 7,
+            'base_experience' => 64,
             'types' => [],
+            'abilities' => [],
+            'held_items' => [],
+            'stats' => [],
+            'moves' => [
+                ['move' => ['name' => 'razor-leaf']],
+            ],
             'sprites' => [],
         ];
     }
