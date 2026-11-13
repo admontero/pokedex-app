@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Exceptions\PokemonRequestException;
 use App\Services\PokemonService;
+use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -80,6 +81,45 @@ class PokemonControllerTest extends TestCase
         $this->get('/pokemon/pikachu')
             ->assertOk()
             ->assertSee('pikachu');
+    }
+
+    public function test_it_accumulates_pages_on_full_loads(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([
+                ['name' => 'bulbasaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/1/'],
+                ['name' => 'ivysaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/2/'],
+            ]);
+
+            $mock->shouldReceive('paginate')
+                ->once()
+                ->with(Mockery::type('array'), 2, 16, true)
+                ->andReturn([$this->pokemonCard(), $this->pokemonCard(['id' => 2, 'name' => 'ivysaur'])]);
+        });
+
+        $this->get('/?page=2')
+            ->assertOk()
+            ->assertSee('bulbasaur')
+            ->assertSee('ivysaur');
+    }
+
+    public function test_it_returns_only_the_requested_page_for_ajax_requests(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([
+                ['name' => 'bulbasaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/1/'],
+                ['name' => 'ivysaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/2/'],
+            ]);
+
+            $mock->shouldReceive('paginate')
+                ->once()
+                ->with(Mockery::type('array'), 2, 16, false)
+                ->andReturn([$this->pokemonCard(['id' => 2, 'name' => 'ivysaur'])]);
+        });
+
+        $this->get('/?page=2', ['X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()
+            ->assertSee('ivysaur');
     }
 
     public function test_it_returns_502_without_leaking_internal_details(): void

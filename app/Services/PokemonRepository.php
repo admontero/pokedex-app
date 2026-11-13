@@ -39,13 +39,23 @@ class PokemonRepository
         return $this->client->getPokemonsByType($type);
     }
 
-    public function paginate(array $data = [], int $page = 1, ?int $perPage = null): array
+    /**
+     * Slice a page out of the given list.
+     *
+     * When $accumulate is true, the result contains every item up to the
+     * requested page. That keeps "load more" pages shareable: reloading
+     * ?page=3 renders the same 48 cards instead of only the last 16.
+     */
+    public function paginate(array $data = [], int $page = 1, ?int $perPage = null, bool $accumulate = false): array
     {
         $perPage ??= (int) config('pokemon.per_page', 16);
 
         $paginatedPokemons = collect($data)
-            ->skip($perPage * ($page - 1))
-            ->take($perPage);
+            ->when(
+                $accumulate,
+                fn ($collection) => $collection->take($perPage * $page),
+                fn ($collection) => $collection->skip($perPage * ($page - 1))->take($perPage),
+            );
 
         $pokemonData = [];
         $pokemonUrls = [];

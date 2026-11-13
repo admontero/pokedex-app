@@ -20,14 +20,22 @@ class PokemonController extends Controller
     public function index(PokemonIndexRequest $request): View
     {
         $page = (int) $request->validated('page', 1);
+        $perPage = (int) config('pokemon.per_page', 16);
+        // AJAX requests only need the new page: the browser appends it to the
+        // grid. Full loads keep every page up to $page so URLs stay shareable.
+        $accumulate = ! $request->ajax();
 
-        session()->put('backUrl', route('pokemons.index', ['page' => $page]));
+        if (! $request->ajax()) {
+            session()->put('backUrl', route('pokemons.index', ['page' => $page]));
+        }
 
         $pokemonList = $this->pokemonService->getAllPokemon();
 
         $viewModel = new PokemonListViewModel(
             total: count($pokemonList),
-            pokemons: $this->pokemonService->paginate($pokemonList, $page),
+            pokemons: $this->pokemonService->paginate($pokemonList, $page, $perPage, accumulate: $accumulate),
+            page: $page,
+            perPage: $perPage,
         );
 
         return view('pokemons.index', $viewModel);

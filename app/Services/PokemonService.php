@@ -25,9 +25,9 @@ class PokemonService
         return $this->search->apply($dto);
     }
 
-    public function paginate(array $data = [], int $page = 1, ?int $perPage = null): array
+    public function paginate(array $data = [], int $page = 1, ?int $perPage = null, bool $accumulate = false): array
     {
-        return $this->repository->paginate($data, $page, $perPage);
+        return $this->repository->paginate($data, $page, $perPage, $accumulate);
     }
 
     public function getPokemon(string $name): array

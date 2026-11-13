@@ -11,5 +11,8 @@
         "laravel-vite-plugin": "^1.0.0",
         "sass": "^1.108.2",
         "vite": "^5.0.0"
+    },
+    "dependencies": {
+        "infinite-scroll": "^4.0.1"
     }
 }

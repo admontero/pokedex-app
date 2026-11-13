@@ -47,6 +47,13 @@ class PokemonRepositoryTest extends TestCase
         $this->assertSame(0, $handler->count(), 'every pokemon should be fetched only once');
 
         $this->assertSame($firstPage, $repository->paginate($list, 1, 2), 'cached pages should not hit the API');
+
+        $accumulated = $repository->paginate($list, 2, 2, accumulate: true);
+        $this->assertSame(
+            ['bulbasaur', 'ivysaur', 'venusaur'],
+            array_column($accumulated, 'name'),
+            'accumulated pages should contain every item up to the requested page'
+        );
     }
 
     public function test_it_finds_a_pokemon_and_caches_it(): void
