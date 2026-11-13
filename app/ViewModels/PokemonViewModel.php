@@ -11,6 +11,8 @@ class PokemonViewModel extends ViewModel
         public array $pokemon,
         public ?string $previous = null,
         public ?string $next = null,
+        public ?string $backUrl = null,
+        public ?string $from = null,
     ) {}
 
     public function pokemon(): object

@@ -1,31 +1,43 @@
-@props(['pokemon'])
+@props(['pokemon', 'from' => null, 'priority' => false])
+
+@php
+    $firstType = $pokemon->types[0] ?? 'normal';
+    $number = str_pad((string) $pokemon->id, 3, '0', STR_PAD_LEFT);
+    $href = route('pokemons.show', array_filter([
+        'name' => $pokemon->name,
+        'from' => $from,
+    ]));
+@endphp
 
 <div class="col">
     <a
-        class="pokemon-card card shadow text-decoration-none"
-        href="{{ route('pokemons.show', $pokemon->name) }}"
+        class="pokemon-card card text-decoration-none type-tint--{{ $firstType }}"
+        href="{{ $href }}"
         id="{{ $pokemon->name }}"
     >
-        <img
-            class="pokemon-card-image card-img-top mx-auto"
-            src="{{ $pokemon->image }}"
-            alt="{{ $pokemon->name }}"
-            width="300"
-            height="300"
-            loading="lazy"
-            decoding="async"
-        >
+        <div class="pokemon-card__media">
+            <span class="pokemon-card__number" aria-hidden="true">#{{ $number }}</span>
 
-        <div class="card-body bg-dark rounded-bottom">
-            <h5 class="card-title text-capitalize pokemon-solid text-center text-white">
-                {{ $pokemon->name }}
-            </h5>
+            <img
+                class="pokemon-card-image"
+                src="{{ $pokemon->image }}"
+                alt=""
+                width="300"
+                height="300"
+                loading="{{ $priority ? 'eager' : 'lazy' }}"
+                fetchpriority="{{ $priority ? 'high' : 'auto' }}"
+                decoding="async"
+            >
+        </div>
 
-            <div class="text-center mt-3">
+        <div class="card-body pokemon-card__body">
+            <h2 class="card-title pokemon-card__name">
+                <span class="visually-hidden">Número {{ $number }}: </span>{{ $pokemon->name }}
+            </h2>
+
+            <div class="pokemon-card__types">
                 @foreach ($pokemon->types as $type)
-                    <span class="badge {{ $type }} fw-semibold px-2 py-1 text-capitalize shadow-lg">
-                        {{ $type }}
-                    </span>
+                    <x-pokemon.type-badge :type="$type" />
                 @endforeach
             </div>
         </div>

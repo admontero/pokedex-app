@@ -2,6 +2,30 @@ import './bootstrap';
 import InfiniteScroll from 'infinite-scroll';
 
 /**
+ * Give feedback while the server searches, so the form is not submitted
+ * twice and slow API responses do not look like a frozen page.
+ */
+document.querySelectorAll('[data-search-form]').forEach((form) => {
+    form.addEventListener('submit', () => {
+        const button = form.querySelector('[data-search-submit]');
+        const spinner = form.querySelector('[data-search-spinner]');
+        const label = form.querySelector('[data-search-label]');
+
+        if (!button) {
+            return;
+        }
+
+        form.setAttribute('aria-busy', 'true');
+        button.disabled = true;
+        spinner?.classList.remove('d-none');
+
+        if (label) {
+            label.textContent = 'Buscando…';
+        }
+    });
+});
+
+/**
  * Infinite scroll with a real "load more" link as fallback.
  *
  * The attribute is `data-pk-infinite-scroll` on purpose: the library
