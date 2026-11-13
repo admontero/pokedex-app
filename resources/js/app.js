@@ -1,6 +1,7 @@
 import './bootstrap';
 import InfiniteScroll from 'infinite-scroll';
 import { initAutocomplete } from './autocomplete';
+import './theme';
 
 document.querySelectorAll('[data-suggest-url]').forEach(initAutocomplete);
 

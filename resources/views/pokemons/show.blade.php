@@ -113,7 +113,7 @@
 
                 <div class="card-body p-0 text-center">
                     <div class="mb-2">
-                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Tipos</h2>
+                        <h2 class="h6 bg-body-secondary py-2 fw-bold mb-0">Tipos</h2>
                         <div class="d-flex flex-wrap justify-content-center gap-2 py-2">
                             @foreach ($pokemon->types as $type)
                                 <x-pokemon.type-badge :type="$type" />
@@ -121,19 +121,19 @@
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Peso</h2>
+                        <h2 class="h6 bg-body-secondary py-2 fw-bold mb-0">Peso</h2>
                         <div>
                             <span>{{ $pokemon->weight }}</span>
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Altura</h2>
+                        <h2 class="h6 bg-body-secondary py-2 fw-bold mb-0">Altura</h2>
                         <div>
                             <span>{{ $pokemon->height }}</span>
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Experiencia base</h2>
+                        <h2 class="h6 bg-body-secondary py-2 fw-bold mb-0">Experiencia base</h2>
                         <div>
                             <span>{{ $pokemon->base_experience }}</span>
                         </div>
@@ -145,7 +145,7 @@
         <div class="col-md-8">
             <div class="card rounded shadow-sm mb-0 mb-md-3">
                 <div class="card-body p-0">
-                    <h2 class="h6 bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
+                    <h2 class="h6 bg-body-secondary fw-bold py-2 text-center rounded-top mb-0">
                         Estadísticas
                     </h2>
                     <div class="p-3">
@@ -155,7 +155,7 @@
                             @endphp
 
                             <div class="stat-row">
-                                <p class="stat-row__label text-dark" id="{{ $statId }}-label">{{ $stat->name }}</p>
+                                <p class="stat-row__label text-body" id="{{ $statId }}-label">{{ $stat->name }}</p>
                                 <div
                                     class="progress stat-row__bar"
                                     role="progressbar"
@@ -178,7 +178,7 @@
                 <div class="col-md-6">
                     <div class="card rounded shadow-sm h-100">
                         <div class="card-body p-0">
-                            <h2 class="h6 bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
+                            <h2 class="h6 bg-body-secondary fw-bold py-2 text-center rounded-top mb-0">
                                 Sprites
                             </h2>
                             @foreach ($pokemon->sprites->chunk(2) as $spriteRow)
@@ -206,7 +206,7 @@
 
                 <div class="col-md-6">
                     <div class="card rounded shadow-sm h-100">
-                        <h2 class="h6 bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
+                        <h2 class="h6 bg-body-secondary fw-bold py-2 text-center rounded-top mb-0">
                             Sprites de hembra
                         </h2>
                         <div class="card-body d-flex flex-column justify-content-center flex-grow-1 p-0">

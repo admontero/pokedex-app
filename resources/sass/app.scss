@@ -12,7 +12,10 @@
     font-display: swap;
 }
 
-:root {
+:root,
+[data-bs-theme='light'] {
+    color-scheme: light;
+
     --pk-red-600: #E60013;
     --pk-red-700: #C1121F;
     --pk-blue-600: #3269B1;
@@ -24,6 +27,42 @@
     --pk-border: #DEE2E6;
     --pk-focus: #0D6EFD;
     --pk-focus-dark: #FFCB05;
+    --pk-link: #C1121F;
+    --pk-tint-base: #FFFFFF;
+    --pk-hover: #E9ECEF;
+    --pk-accent-soft: rgba(230, 0, 19, 0.08);
+    --pk-shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+    --pk-shadow-lg: 0 0.75rem 1.5rem rgba(16, 24, 40, 0.12);
+}
+
+[data-bs-theme='dark'] {
+    color-scheme: dark;
+
+    --pk-ink: #E9ECEF;
+    --pk-muted: #ADB5BD;
+    --pk-canvas: #0F1216;
+    --pk-surface: #1A1F26;
+    --pk-border: #343A40;
+    --pk-focus: #6EA8FE;
+    --pk-focus-dark: #FFCB05;
+    --pk-link: #FF8A94;
+    --pk-tint-base: #1A1F26;
+    --pk-hover: #2B3138;
+    --pk-accent-soft: rgba(230, 0, 19, 0.28);
+    --pk-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --pk-shadow-lg: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.55);
+
+    // Keep Bootstrap components (cards, inputs, alerts...) on the same
+    // palette as the custom tokens.
+    --bs-body-bg: var(--pk-surface);
+    --bs-body-color: var(--pk-ink);
+    --bs-border-color: var(--pk-border);
+    --bs-secondary-bg: var(--pk-hover);
+    --bs-tertiary-bg: var(--pk-canvas);
+    --bs-emphasis-color: var(--pk-ink);
+    --bs-heading-color: var(--pk-ink);
+    --bs-link-color: var(--pk-link);
+    --bs-link-hover-color: #FFB3B9;
 }
 
 @each $name, $color in $type-colors {
@@ -64,10 +103,10 @@ body {
     font-weight: 700;
     line-height: 1.2;
     color: var(--pk-ink);
-    background: #F1F3F5;
-    background: color-mix(in srgb, var(--type-color, #A8A090) 16%, #fff);
-    border: 1px solid #DEE2E6;
-    border-color: color-mix(in srgb, var(--type-color, #A8A090) 42%, #fff);
+    background: var(--pk-hover);
+    background: color-mix(in srgb, var(--type-color, #A8A090) 16%, var(--pk-tint-base));
+    border: 1px solid var(--pk-border);
+    border-color: color-mix(in srgb, var(--type-color, #A8A090) 42%, var(--pk-tint-base));
 }
 
 .type-badge::before {
@@ -107,14 +146,14 @@ body {
     border: 1px solid var(--pk-border);
     border-radius: 1rem;
     overflow: hidden;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    box-shadow: var(--pk-shadow-sm);
     transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 }
 
 .pokemon-card:hover,
 .pokemon-card:focus-visible {
     transform: translateY(-2px);
-    box-shadow: 0 0.75rem 1.5rem rgba(16, 24, 40, 0.12);
+    box-shadow: var(--pk-shadow-lg);
     border-color: color-mix(in srgb, var(--type-color, #A8A090) 45%, var(--pk-border));
 }
 
@@ -128,8 +167,8 @@ body {
     align-items: center;
     justify-content: center;
     padding: 1.25rem 1rem 0.25rem;
-    background: #F1F3F5;
-    background: color-mix(in srgb, var(--type-color, #A8A090) 18%, #fff);
+    background: var(--pk-hover);
+    background: color-mix(in srgb, var(--type-color, #A8A090) 18%, var(--pk-tint-base));
     border-bottom: 1px solid var(--pk-border);
 }
 
@@ -140,7 +179,7 @@ body {
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.04em;
-    color: #495057;
+    color: var(--pk-muted);
 }
 
 .pokemon-card-image {
@@ -180,8 +219,8 @@ body {
 
 .pokemon-detail-header {
     border-radius: 1rem;
-    background: #F1F3F5;
-    background: color-mix(in srgb, var(--type-color, #A8A090) 14%, #fff);
+    background: var(--pk-hover);
+    background: color-mix(in srgb, var(--type-color, #A8A090) 14%, var(--pk-tint-base));
     border: 1px solid var(--pk-border);
 }
 
@@ -239,7 +278,7 @@ body {
 }
 
 .filter-chip__remove:hover {
-    background: #E9ECEF;
+    background: var(--pk-hover);
     color: var(--pk-ink);
 }
 
@@ -267,7 +306,7 @@ body {
     background: var(--pk-surface);
     border: 1px solid var(--pk-border);
     border-radius: 0.75rem;
-    box-shadow: 0 0.75rem 1.5rem rgba(16, 24, 40, 0.14);
+    box-shadow: var(--pk-shadow-lg);
 }
 
 .search-suggest__option {
@@ -281,7 +320,7 @@ body {
 
 .search-suggest__option:hover,
 .search-suggest__option[aria-selected='true'] {
-    background: color-mix(in srgb, var(--pk-red-600) 10%, #fff);
+    background: var(--pk-accent-soft);
 }
 
 .search-suggest__number {
@@ -331,7 +370,7 @@ body {
 }
 
 .breadcrumb-pk a {
-    color: var(--pk-red-700);
+    color: var(--pk-link);
     text-decoration: none;
 }
 
@@ -341,8 +380,53 @@ body {
 
 .navbar-brand img {
     width: 250px;
-    max-width: 70vw;
+    max-width: min(70vw, calc(100vw - 8rem));
     height: auto;
+}
+
+.theme-toggle-spacer,
+.theme-toggle {
+    flex: 0 0 auto;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+}
+
+.theme-toggle:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.22);
+}
+
+.theme-toggle__icon {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+.theme-toggle__icon--sun {
+    display: none;
+}
+
+[data-bs-theme='dark'] .theme-toggle__icon--sun {
+    display: block;
+}
+
+[data-bs-theme='dark'] .theme-toggle__icon--moon {
+    display: none;
+}
+
+[data-bs-theme='dark'] .text-pokemon-red-dark {
+    color: var(--pk-link) !important;
 }
 
 .visually-hidden-focusable:focus {
@@ -412,7 +496,7 @@ html {
 }
 
 .site-footer a {
-    color: var(--pk-red-700);
+    color: var(--pk-link);
 }
 
 /* ---------------------------------------------------------------- */
