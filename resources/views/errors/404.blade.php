@@ -15,7 +15,7 @@
 
         <div class="row">
             <div class="col-md-8 mx-auto">
-                <div class="py-3 px-2 bg-white shadow-sm border rounded text-center my-5">
+                <div class="py-3 px-2 bg-body shadow-sm border rounded text-center my-5">
                     <h1 class="h2">Pokémon no encontrado</h1>
                     <p class="lead">
                         Al parecer no contamos con los registros de ese Pokémon. Puedes volver

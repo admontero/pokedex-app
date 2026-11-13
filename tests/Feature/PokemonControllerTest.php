@@ -46,6 +46,24 @@ class PokemonControllerTest extends TestCase
             ->assertSee(route('pokemons.suggest'), false);
     }
 
+    public function test_the_layout_exposes_a_theme_toggle(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([
+                ['name' => 'bulbasaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/1/'],
+            ]);
+
+            $mock->shouldReceive('paginate')->once()->andReturn([$this->pokemonCard()]);
+        });
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-bs-theme="light"', false)
+            ->assertSee('data-theme-toggle', false)
+            ->assertSee('aria-pressed="false"', false)
+            ->assertSee("localStorage.getItem('pk-theme')", false);
+    }
+
     public function test_it_rejects_an_invalid_page(): void
     {
         $this->get('/?page=abc')
