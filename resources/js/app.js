@@ -1,5 +1,8 @@
 import './bootstrap';
 import InfiniteScroll from 'infinite-scroll';
+import { initAutocomplete } from './autocomplete';
+
+document.querySelectorAll('[data-suggest-url]').forEach(initAutocomplete);
 
 /**
  * Give feedback while the server searches, so the form is not submitted

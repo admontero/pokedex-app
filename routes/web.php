@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PokemonController;
 use App\Http\Controllers\PokemonSearchController;
+use App\Http\Controllers\PokemonSuggestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,10 @@ Route::get('/', [PokemonController::class, 'index'])
 
 Route::get('/pokemon/search', PokemonSearchController::class)
     ->name('pokemons.search');
+
+// Registered before the show route: "suggest" would otherwise match {name}.
+Route::get('/pokemon/suggest', PokemonSuggestController::class)
+    ->name('pokemons.suggest');
 
 Route::get('/pokemon/{name}', [PokemonController::class, 'show'])
     ->name('pokemons.show')

@@ -248,6 +248,58 @@ body {
 }
 
 /* ---------------------------------------------------------------- */
+/* Search suggestions (combobox)                                     */
+/* ---------------------------------------------------------------- */
+
+.search-suggest {
+    position: relative;
+}
+
+.search-suggest__list {
+    position: absolute;
+    z-index: 1020;
+    inset-inline: 0;
+    top: calc(100% + 0.25rem);
+    max-height: 20rem;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.25rem;
+    background: var(--pk-surface);
+    border: 1px solid var(--pk-border);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.75rem 1.5rem rgba(16, 24, 40, 0.14);
+}
+
+.search-suggest__option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.search-suggest__option:hover,
+.search-suggest__option[aria-selected='true'] {
+    background: color-mix(in srgb, var(--pk-red-600) 10%, #fff);
+}
+
+.search-suggest__number {
+    flex: 0 0 auto;
+    min-width: 3.25rem;
+    color: var(--pk-muted);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.search-suggest__name {
+    color: var(--pk-ink);
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+/* ---------------------------------------------------------------- */
 /* Empty states                                                      */
 /* ---------------------------------------------------------------- */
 

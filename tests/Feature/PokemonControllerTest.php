@@ -26,6 +26,26 @@ class PokemonControllerTest extends TestCase
             ->assertSee('Mostrando');
     }
 
+    public function test_the_search_form_exposes_an_accessible_combobox(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([
+                ['name' => 'bulbasaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/1/'],
+            ]);
+
+            $mock->shouldReceive('paginate')->once()->andReturn([$this->pokemonCard()]);
+        });
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('role="combobox"', false)
+            ->assertSee('aria-autocomplete="list"', false)
+            ->assertSee('aria-expanded="false"', false)
+            ->assertSee('id="term-suggestions"', false)
+            ->assertSee('role="listbox"', false)
+            ->assertSee(route('pokemons.suggest'), false);
+    }
+
     public function test_it_rejects_an_invalid_page(): void
     {
         $this->get('/?page=abc')

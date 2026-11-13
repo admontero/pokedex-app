@@ -379,14 +379,16 @@ Ventajas: contraste alto y uniforme, menos ruido visual, el color sigue identifi
 
 ### P2 — Pulido y calidad continua
 
-| # | Acción | Impacto |
-|---|---|---|
-| 19 | Autocompletado/sugerencias y búsqueda por número | Descubribilidad |
-| 20 | Modo oscuro con `data-bs-theme` y tokens | Preferencia |
-| 21 | WebP/AVIF + `srcset`; comprimir `rocket.png`; eliminar `pikachusin.jpg` | Peso |
-| 22 | CI con axe-core/Playwright, Lighthouse CI y validación HTML | Prevención de regresiones |
-| 23 | Pruebas de regresión visual desktop/móvil | Consistencia |
-| 24 | Documentar tokens y patrones de componentes | Mantenibilidad |
+| # | Acción | Impacto | Estado |
+|---|---|---|---|
+| 19 | Autocompletado/sugerencias y búsqueda por número | Descubribilidad | ✅ |
+| 20 | Modo oscuro con `data-bs-theme` y tokens | Preferencia | ⏳ |
+| 21 | WebP/AVIF + `srcset`; comprimir `rocket.png`; eliminar `pikachusin.jpg` | Peso | ⏳ |
+| 22 | CI con axe-core/Playwright, Lighthouse CI y validación HTML | Prevención de regresiones | ⏳ |
+| 23 | Pruebas de regresión visual desktop/móvil | Consistencia | ⏳ |
+| 24 | Documentar tokens y patrones de componentes | Mantenibilidad | ⏳ |
+
+> **Autocompletado (19):** el buscador es un combobox ARIA (`role="combobox"`, `aria-autocomplete="list"`, `aria-expanded`/`aria-controls`, listbox `#term-suggestions` y región `aria-live`). Un módulo JS con debounce de 200 ms consulta `GET /pokemon/suggest?term=…`, cancela peticiones anteriores con `AbortController` y permite navegar con ↑/↓/Enter/Escape o con puntero. Las sugerencias se construyen desde el listado ya cacheado (`PokemonSuggestions`) con este orden: prefijo de nombre, número exacto, prefijo de número y coincidencia contenida; se muestran como `#025 Pikachu` y enlazan al detalle con `from` para conservar el breadcrumb de vuelta. Sin JavaScript el formulario sigue funcionando igual.
 
 ---
 
