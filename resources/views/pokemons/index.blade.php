@@ -10,7 +10,7 @@
         </p>
     </section>
 
-    <div class="row align-items-end g-3 py-2">
+    <div class="row align-items-center g-3 py-2">
         <div class="col-md-4">
             <p class="mb-0 text-muted-pk">
                 Mostrando <strong class="text-pokemon-red-dark" data-shown-count>{{ $shown }}</strong> de {{ $total }} Pokémon

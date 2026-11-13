@@ -28,7 +28,7 @@
 >
     <x-breadcrumb :items="$breadcrumb" />
 
-    <div class="row align-items-end g-3 mb-4">
+    <div class="row align-items-center g-3 mb-4">
         <div class="col-md-4">
             <a
                 class="btn btn-sm btn-secondary text-white d-inline-flex align-items-center"
