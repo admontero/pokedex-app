@@ -48,4 +48,45 @@ return [
         'fairy',
     ],
 
+    'stat_labels' => [
+        'hp' => 'PS',
+        'attack' => 'Ataque',
+        'defense' => 'Defensa',
+        'special-attack' => 'Ataque especial',
+        'special-defense' => 'Defensa especial',
+        'speed' => 'Velocidad',
+    ],
+
+    'sprite_labels' => [
+        'front_default' => 'Frente',
+        'back_default' => 'Espalda',
+        'front_shiny' => 'Frente variocolor',
+        'back_shiny' => 'Espalda variocolor',
+        'front_female' => 'Frente (hembra)',
+        'back_female' => 'Espalda (hembra)',
+        'front_shiny_female' => 'Frente variocolor (hembra)',
+        'back_shiny_female' => 'Espalda variocolor (hembra)',
+    ],
+
+    'type_labels' => [
+        'normal' => 'Normal',
+        'fighting' => 'Lucha',
+        'flying' => 'Volador',
+        'poison' => 'Veneno',
+        'ground' => 'Tierra',
+        'rock' => 'Roca',
+        'bug' => 'Bicho',
+        'ghost' => 'Fantasma',
+        'steel' => 'Acero',
+        'fire' => 'Fuego',
+        'water' => 'Agua',
+        'grass' => 'Planta',
+        'electric' => 'Eléctrico',
+        'psychic' => 'Psíquico',
+        'ice' => 'Hielo',
+        'dragon' => 'Dragón',
+        'dark' => 'Siniestro',
+        'fairy' => 'Hada',
+    ],
+
 ];

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Exceptions\PokemonRequestException;
 use App\Services\PokemonService;
+use Mockery;
 use Mockery\MockInterface;
 use Tests\TestCase;
 
@@ -22,7 +23,7 @@ class PokemonControllerTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('bulbasaur')
-            ->assertSee('Resultados');
+            ->assertSee('Mostrando');
     }
 
     public function test_it_rejects_an_invalid_page(): void
@@ -51,7 +52,28 @@ class PokemonControllerTest extends TestCase
         $this->get('/pokemon/search?term=pika&page=2')
             ->assertOk()
             ->assertSee('pikachu')
-            ->assertSee('Resultados de la búsqueda');
+            ->assertSee('Resultados para');
+    }
+
+    public function test_it_searches_pokemon_by_number(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllBySearch')
+                ->once()
+                ->with(Mockery::on(fn ($dto) => $dto->term === '25' && $dto->type === null))
+                ->andReturn([
+                    ['name' => 'pikachu', 'url' => 'https://pokeapi.co/api/v2/pokemon/25/'],
+                ]);
+
+            $mock->shouldReceive('paginate')->once()->andReturn([
+                $this->pokemonCard(['id' => 25, 'name' => 'pikachu']),
+            ]);
+        });
+
+        $this->get('/pokemon/search?term=25')
+            ->assertOk()
+            ->assertSee('pikachu')
+            ->assertSee('Resultados para');
     }
 
     public function test_it_rejects_an_invalid_search_page_and_type(): void
@@ -80,6 +102,159 @@ class PokemonControllerTest extends TestCase
         $this->get('/pokemon/pikachu')
             ->assertOk()
             ->assertSee('pikachu');
+    }
+
+    public function test_it_uses_a_local_from_url_as_the_back_destination(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getPokemon')->once()->andReturn($this->pokemonCard([
+                'id' => 25,
+                'name' => 'pikachu',
+            ]));
+
+            $mock->shouldReceive('getPreviousPokemonName')->once()->andReturn(null);
+            $mock->shouldReceive('getNextPokemonName')->once()->andReturn(null);
+        });
+
+        $from = urlencode('/pokemon/search?term=pika');
+
+        $this->get('/pokemon/pikachu?from='.$from)
+            ->assertOk()
+            ->assertSee('href="/pokemon/search?term=pika"', false);
+    }
+
+    public function test_it_ignores_a_cross_site_from_url(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getPokemon')->twice()->andReturn($this->pokemonCard([
+                'id' => 25,
+                'name' => 'pikachu',
+            ]));
+
+            $mock->shouldReceive('getPreviousPokemonName')->twice()->andReturn(null);
+            $mock->shouldReceive('getNextPokemonName')->twice()->andReturn(null);
+        });
+
+        $this->get('/pokemon/pikachu?from='.urlencode('https://evil.test/phish'))
+            ->assertOk()
+            ->assertDontSee('evil.test');
+
+        $this->get('/pokemon/pikachu?from='.urlencode('http://localhost.evil.test/phish'))
+            ->assertOk()
+            ->assertDontSee('localhost.evil.test');
+    }
+
+    public function test_it_shows_a_load_more_link_when_there_are_more_results(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn(
+                array_map(
+                    fn (int $id): array => ['name' => 'pokemon-'.$id, 'url' => 'https://pokeapi.co/api/v2/pokemon/'.$id.'/'],
+                    range(1, 17),
+                )
+            );
+
+            $mock->shouldReceive('paginate')->once()->andReturn([$this->pokemonCard()]);
+        });
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Mostrando')
+            ->assertSee('Cargar más Pokémon');
+    }
+
+    public function test_it_hides_the_load_more_link_on_the_last_page(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([
+                ['name' => 'bulbasaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/1/'],
+                ['name' => 'ivysaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/2/'],
+            ]);
+
+            $mock->shouldReceive('paginate')->once()->andReturn([$this->pokemonCard()]);
+        });
+
+        $this->get('/?page=2')
+            ->assertOk()
+            ->assertSee('Has llegado al final de la lista')
+            ->assertDontSee('Cargar más Pokémon');
+    }
+
+    public function test_it_marks_the_scroller_with_a_custom_attribute(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn(
+                array_map(
+                    fn (int $id): array => ['name' => 'pokemon-'.$id, 'url' => 'https://pokeapi.co/api/v2/pokemon/'.$id.'/'],
+                    range(1, 17),
+                )
+            );
+
+            $mock->shouldReceive('paginate')->once()->andReturn([$this->pokemonCard()]);
+        });
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('data-pk-infinite-scroll', false)
+            ->assertDontSee('data-infinite-scroll=', false);
+    }
+
+    public function test_it_accumulates_pages_on_full_loads(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([
+                ['name' => 'bulbasaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/1/'],
+                ['name' => 'ivysaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/2/'],
+            ]);
+
+            $mock->shouldReceive('paginate')
+                ->once()
+                ->with(Mockery::type('array'), 2, 16, true)
+                ->andReturn([$this->pokemonCard(), $this->pokemonCard(['id' => 2, 'name' => 'ivysaur'])]);
+        });
+
+        $this->get('/?page=2')
+            ->assertOk()
+            ->assertSee('bulbasaur')
+            ->assertSee('ivysaur');
+    }
+
+    public function test_it_returns_only_the_requested_page_for_ajax_requests(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([
+                ['name' => 'bulbasaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/1/'],
+                ['name' => 'ivysaur', 'url' => 'https://pokeapi.co/api/v2/pokemon/2/'],
+            ]);
+
+            $mock->shouldReceive('paginate')
+                ->once()
+                ->with(Mockery::type('array'), 2, 16, false)
+                ->andReturn([$this->pokemonCard(['id' => 2, 'name' => 'ivysaur'])]);
+        });
+
+        $this->get('/?page=2', ['X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()
+            ->assertSee('ivysaur');
+    }
+
+    public function test_it_returns_only_the_requested_search_page_for_ajax_requests(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllBySearch')->once()->andReturn([
+                ['name' => 'pikachu', 'url' => 'https://pokeapi.co/api/v2/pokemon/25/'],
+            ]);
+
+            $mock->shouldReceive('paginate')
+                ->once()
+                ->with(Mockery::type('array'), 2, 16, false)
+                ->andReturn([$this->pokemonCard(['id' => 25, 'name' => 'pikachu'])]);
+        });
+
+        $this->get('/pokemon/search?term=pika&page=2', ['X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()
+            ->assertSee('pikachu')
+            ->assertDontSee('pagination__next');
     }
 
     public function test_it_returns_502_without_leaking_internal_details(): void

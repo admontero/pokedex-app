@@ -47,6 +47,43 @@ class PokemonRepositoryTest extends TestCase
         $this->assertSame(0, $handler->count(), 'every pokemon should be fetched only once');
 
         $this->assertSame($firstPage, $repository->paginate($list, 1, 2), 'cached pages should not hit the API');
+
+        $accumulated = $repository->paginate($list, 2, 2, accumulate: true);
+        $this->assertSame(
+            ['bulbasaur', 'ivysaur', 'venusaur'],
+            array_column($accumulated, 'name'),
+            'accumulated pages should contain every item up to the requested page'
+        );
+    }
+
+    public function test_it_returns_lightweight_cards_for_the_list(): void
+    {
+        $handler = new MockHandler([
+            $this->jsonResponse($this->pokemonList()),
+            $this->jsonResponse($this->pokemon(1, 'bulbasaur')),
+            $this->jsonResponse($this->pokemon(2, 'ivysaur')),
+            $this->jsonResponse($this->pokemon(3, 'venusaur')),
+        ]);
+        $repository = $this->repository($handler);
+
+        $cards = $repository->paginate($repository->all(), 1, 2);
+
+        $this->assertSame(['id', 'name', 'image', 'types'], array_keys($cards[0]));
+        $this->assertArrayNotHasKey('sprites', $cards[0]);
+        $this->assertArrayNotHasKey('moves', $cards[0]);
+    }
+
+    public function test_it_trims_the_cached_detail_payload(): void
+    {
+        $handler = new MockHandler([$this->jsonResponse($this->pokemon(25, 'pikachu'))]);
+        $repository = $this->repository($handler);
+
+        $detail = $repository->find('pikachu');
+
+        $this->assertArrayNotHasKey('moves', $detail);
+        $this->assertArrayHasKey('sprites', $detail);
+        $this->assertSame(69, $detail['weight']);
+        $this->assertSame(64, $detail['base_experience']);
     }
 
     public function test_it_finds_a_pokemon_and_caches_it(): void

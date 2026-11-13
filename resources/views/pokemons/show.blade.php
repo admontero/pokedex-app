@@ -1,188 +1,242 @@
-<x-app-layout>
-    <div class="row align-items-center mb-3">
+@php
+    $firstType = $pokemon->types[0] ?? 'normal';
+    $number = str_pad((string) $pokemon->id, 3, '0', STR_PAD_LEFT);
+    $fromIsSearch = is_string($from) && str_contains($from, '/pokemon/search');
+
+    $breadcrumb = [
+        ['label' => 'Inicio', 'url' => route('pokemons.index')],
+    ];
+
+    if ($fromIsSearch) {
+        $breadcrumb[] = ['label' => 'Resultados', 'url' => $from];
+    }
+
+    $breadcrumb[] = ['label' => ucfirst($pokemon->name)];
+
+    $previousUrl = $previous
+        ? route('pokemons.show', array_filter(['name' => $previous, 'from' => $from]))
+        : null;
+
+    $nextUrl = $next
+        ? route('pokemons.show', array_filter(['name' => $next, 'from' => $from]))
+        : null;
+@endphp
+
+<x-app-layout
+    :title="ucfirst($pokemon->name)"
+    :description="'Información, estadísticas y sprites de '.$pokemon->name.'.'"
+>
+    <x-breadcrumb :items="$breadcrumb" />
+
+    <div class="row align-items-center g-3 mb-4">
         <div class="col-md-4">
             <a
                 class="btn btn-sm btn-secondary text-white d-inline-flex align-items-center"
-                href="{{ session()->get('backUrl') ?? route('pokemons.index') }}"
-                role="button"
+                href="{{ $backUrl ?? route('pokemons.index') }}"
             >
-                <i class="fa fa-arrow-left me-2"></i>
+                <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
                 Volver
             </a>
-            <hr class="d-md-none">
         </div>
         <div class="col-md-8">
             <x-pokemon.form-search />
         </div>
     </div>
 
-    <div class="row -0 mb-md-2">
-        <div class="col-md-4 order-1 order-md-0">
-            <h5 class="text-capitalize text-center text-white pokemon-solid bg-dark rounded pt-1 pb-3 mb-0">
-                {{ $pokemon->name }}
-            </h5>
-        </div>
-        <div class="col-md-8 order-0 order-md-1">
-            <div class="d-flex justify-content-between align-items-center h-100">
-                <a
-                    class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center {{ !$previous ? 'disabled' : '' }}"
-                    href="{{ $previous ? route('pokemons.show', $previous) : '#' }}"
-                    role="button"
-                >
-                    <i class="fa fa-arrow-left-long me-2"></i>
-                    Anterior
-                </a>
+    <header class="pokemon-detail-header type-tint--{{ $firstType }} p-3 p-md-4 mb-4">
+        <div class="row align-items-center g-3">
+            <div class="col-md-7">
+                <p class="pokemon-detail-header__number mb-1">#{{ $number }}</p>
+                <h1 class="pokemon-detail-title">{{ $pokemon->name }}</h1>
 
-                <a
-                    class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center {{ !$next ? 'disabled' : '' }}"
-                    href="{{ $next ? route('pokemons.show', $next) : '#' }}"
-                    role="button"
-                >
-                    Siguiente
-                    <i class="fa fa-arrow-right-long ms-2"></i>
-                </a>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach ($pokemon->types as $type)
+                        <x-pokemon.type-badge :type="$type" />
+                    @endforeach
+                </div>
             </div>
-            <hr class="d-md-none">
-        </div>
-    </div>
 
-    <div class="row">
+            <div class="col-md-5">
+                <div class="d-flex justify-content-md-end gap-2">
+                    @if ($previousUrl)
+                        <a
+                            class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center prev-next-btn"
+                            href="{{ $previousUrl }}"
+                            rel="prev"
+                            aria-label="Anterior: {{ $previous }}"
+                        >
+                            <i class="fa fa-arrow-left-long me-2" aria-hidden="true"></i>
+                            <span>Anterior</span>
+                            <span class="prev-next-btn__name ms-1">{{ $previous }}</span>
+                        </a>
+                    @else
+                        <span class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center prev-next-btn disabled" aria-disabled="true">
+                            <i class="fa fa-arrow-left-long me-2" aria-hidden="true"></i>
+                            <span>Anterior</span>
+                        </span>
+                    @endif
+
+                    @if ($nextUrl)
+                        <a
+                            class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center prev-next-btn"
+                            href="{{ $nextUrl }}"
+                            rel="next"
+                            aria-label="Siguiente: {{ $next }}"
+                        >
+                            <span>Siguiente</span>
+                            <span class="prev-next-btn__name ms-1">{{ $next }}</span>
+                            <i class="fa fa-arrow-right-long ms-2" aria-hidden="true"></i>
+                        </a>
+                    @else
+                        <span class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center prev-next-btn disabled" aria-disabled="true">
+                            <span>Siguiente</span>
+                            <i class="fa fa-arrow-right-long ms-2" aria-hidden="true"></i>
+                        </span>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="row g-4">
         <div class="col-md-4">
-            <div class="card shadow">
+            <div class="card shadow-sm">
                 <img
                     src="{{ $pokemon->image }}"
-                    class="card-img-top px-4"
-                    alt="{{ $pokemon->name }} image"
+                    class="card-img-top pokemon-detail-image px-4 pt-3"
+                    alt="Ilustración oficial de {{ $pokemon->name }}"
+                    width="475"
+                    height="475"
+                    fetchpriority="high"
+                    decoding="async"
                 />
 
                 <div class="card-body p-0 text-center">
                     <div class="mb-2">
-                        <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Tipos</h6>
-                        <div>
+                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Tipos</h2>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 py-2">
                             @foreach ($pokemon->types as $type)
-                                <span class="badge {{ $type }} px-2 py-1 text-capitalize">
-                                    {{ $type }}
-                                </span>
+                                <x-pokemon.type-badge :type="$type" />
                             @endforeach
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Peso</h6>
+                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Peso</h2>
                         <div>
                             <span>{{ $pokemon->weight }}</span>
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Altura</h6>
+                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Altura</h2>
                         <div>
                             <span>{{ $pokemon->height }}</span>
                         </div>
                     </div>
                     <div class="mb-2">
-                        <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Experiencia Base</h6>
+                        <h2 class="h6 bg-dark bg-opacity-10 py-2 fw-bold mb-0">Experiencia base</h2>
                         <div>
                             <span>{{ $pokemon->base_experience }}</span>
                         </div>
                     </div>
-                    {{-- <div class="mb-2">
-                        <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Habilidades</h6>
-                        <div>
-                            {{ $pokemon->abilities }}
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <h6 class="bg-dark bg-opacity-10 py-2 fw-bold">Items</h6>
-                        <div>
-                            {{ $pokemon->items }}
-                        </div>
-                    </div> --}}
                 </div>
             </div>
-
-            <hr class="d-md-none">
         </div>
 
         <div class="col-md-8">
-            <div class="card rounded shadow mb-0 mb-md-3">
+            <div class="card rounded shadow-sm mb-0 mb-md-3">
                 <div class="card-body p-0">
-                    <h6 class="bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
+                    <h2 class="h6 bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
                         Estadísticas
-                    </h6>
+                    </h2>
                     <div class="p-3">
                         @foreach ($pokemon->stats as $stat)
-                            <div class="d-flex">
-                                <p class="text-dark text-capitalize font-weight-bold" style="width: 200px;">{{ $stat->name }}</p>
-                                <div class="progress font-weight-bold text-capitalize" style="height: 20px; width:100%;">
-                                    <div class="progress-bar bg-pokemon-red" role="progressbar" style="width: {{ $stat->percentage }}%"
-                                        aria-valuenow="{{ $stat->percentage }}" aria-valuemin="0" aria-valuemax="100">
-                                        {{ $stat->value }}
-                                    </div>
+                            @php
+                                $statId = 'stat-'.$loop->index;
+                            @endphp
+
+                            <div class="stat-row">
+                                <p class="stat-row__label text-dark" id="{{ $statId }}-label">{{ $stat->name }}</p>
+                                <div
+                                    class="progress stat-row__bar"
+                                    role="progressbar"
+                                    aria-labelledby="{{ $statId }}-label"
+                                    aria-valuenow="{{ $stat->value }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="255"
+                                    aria-valuetext="{{ $stat->value }} de 255 ({{ (int) round($stat->percentage) }}%)"
+                                >
+                                    <div class="progress-bar bg-pokemon-red" style="width: {{ round($stat->percentage, 1) }}%"></div>
                                 </div>
+                                <span class="stat-row__value">{{ $stat->value }}</span>
                             </div>
                         @endforeach
                     </div>
                 </div>
             </div>
 
-            <hr class="d-md-none">
-
-            <div class="row">
+            <div class="row g-4">
                 <div class="col-md-6">
-                    <div class="card rounded shadow">
+                    <div class="card rounded shadow-sm h-100">
                         <div class="card-body p-0">
-                            <h6 class="bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
+                            <h2 class="h6 bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
                                 Sprites
-                            </h6>
-                            @for ($i = 0; $i < $pokemon->sprites->count() / 2; $i++)
+                            </h2>
+                            @foreach ($pokemon->sprites->chunk(2) as $spriteRow)
                                 <div class="d-flex justify-content-around">
-                                    @foreach ($pokemon->sprites->skip($i * 2)->take(2) as $sprite)
+                                    @foreach ($spriteRow as $sprite)
                                         <div>
-                                            <img src="{{ $sprite->image }}" alt="{{ $pokemon->name  }}'s sprite"
-                                                class="d-block mx-auto">
+                                            <img
+                                                src="{{ $sprite->image }}"
+                                                alt="{{ $sprite->name }} de {{ $pokemon->name }}"
+                                                class="d-block mx-auto"
+                                                width="96"
+                                                height="96"
+                                                loading="lazy"
+                                                decoding="async"
+                                            >
 
                                             <p class="text-center">{{ $sprite->name }}</p>
                                         </div>
                                     @endforeach
                                 </div>
-                            @endfor
+                            @endforeach
                         </div>
                     </div>
-
-                    <hr class="d-md-none">
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card rounded shadow h-100">
-                        <h6 class="bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
-                            Female Sprites
-                        </h6>
+                    <div class="card rounded shadow-sm h-100">
+                        <h2 class="h6 bg-dark bg-opacity-10 fw-bold py-2 text-center rounded-top mb-0">
+                            Sprites de hembra
+                        </h2>
                         <div class="card-body d-flex flex-column justify-content-center flex-grow-1 p-0">
                             @if ($pokemon->female_sprites->count())
-                                @for ($i = 0; $i < $pokemon->female_sprites->count() / 2; $i++)
+                                @foreach ($pokemon->female_sprites->chunk(2) as $spriteRow)
                                     <div class="d-flex justify-content-around">
-                                        @foreach ($pokemon->female_sprites->skip($i * 2)->take(2) as $sprite)
+                                        @foreach ($spriteRow as $sprite)
                                             <div>
                                                 <img
                                                     class="d-block mx-auto"
                                                     src="{{ $sprite->image }}"
-                                                    alt="{{ $pokemon->name  }}'s sprite"
+                                                    alt="{{ $sprite->name }} de {{ $pokemon->name }}"
+                                                    width="96"
+                                                    height="96"
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 >
 
                                                 <p class="text-center">{{ $sprite->name }}</p>
                                             </div>
                                         @endforeach
                                     </div>
-                                @endfor
+                                @endforeach
                             @else
                                 <p class="text-center fst-italic mb-0">
                                     Sin diferencias de género
                                 </p>
                             @endif
-
                         </div>
                     </div>
-
-                    <hr class="d-md-none">
                 </div>
             </div>
         </div>

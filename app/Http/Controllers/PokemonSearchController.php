@@ -16,18 +16,25 @@ class PokemonSearchController extends Controller
     public function __invoke(PokemonSearchRequest $request, PokemonService $pokemonService): View
     {
         $page = (int) $request->validated('page', 1);
+        $perPage = (int) config('pokemon.per_page', 16);
+        // AJAX requests only need the new page; full loads stay accumulative.
+        $accumulate = ! $request->ajax();
 
-        session()->put('backUrl', route('pokemons.search', [
-            'page' => $page,
-            'term' => $request->validated('term'),
-            'type' => $request->validated('type'),
-        ]));
+        if (! $request->ajax()) {
+            session()->put('backUrl', route('pokemons.search', [
+                'page' => $page,
+                'term' => $request->validated('term'),
+                'type' => $request->validated('type'),
+            ]));
+        }
 
         $pokemonList = $pokemonService->getAllBySearch(PokemonSearchDTO::fromRequest($request));
 
         $viewModel = new PokemonListViewModel(
             total: count($pokemonList),
-            pokemons: $pokemonService->paginate($pokemonList, $page)
+            pokemons: $pokemonService->paginate($pokemonList, $page, $perPage, accumulate: $accumulate),
+            page: $page,
+            perPage: $perPage,
         );
 
         return view('pokemons.search', $viewModel);

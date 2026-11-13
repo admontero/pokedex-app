@@ -45,6 +45,34 @@ class PokemonSearchTest extends TestCase
         $this->assertSame(['charmander', 'charizard'], array_column($results, 'name'));
     }
 
+    public function test_it_finds_a_pokemon_by_its_pokedex_number(): void
+    {
+        $handler = new MockHandler([$this->jsonResponse($this->pokemonList())]);
+        $search = new PokemonSearch($this->repository($handler));
+
+        $this->assertSame(['ivysaur'], array_column($search->apply(new PokemonSearchDTO('2', null)), 'name'));
+        $this->assertSame(['venusaur'], array_column($search->apply(new PokemonSearchDTO('003', null)), 'name'));
+        $this->assertSame(['bulbasaur'], array_column($search->apply(new PokemonSearchDTO('#1', null)), 'name'));
+        $this->assertSame([], $search->apply(new PokemonSearchDTO('25', null)), 'an unknown number must not match every pokemon');
+    }
+
+    public function test_it_combines_type_and_number(): void
+    {
+        $handler = new MockHandler([
+            $this->jsonResponse([
+                'pokemon' => [
+                    ['pokemon' => ['name' => 'charmander', 'url' => 'https://pokeapi.co/api/v2/pokemon/4/']],
+                    ['pokemon' => ['name' => 'charizard', 'url' => 'https://pokeapi.co/api/v2/pokemon/6/']],
+                ],
+            ]),
+        ]);
+
+        $results = (new PokemonSearch($this->repository($handler)))
+            ->apply(new PokemonSearchDTO('6', 'fire'));
+
+        $this->assertSame(['charizard'], array_column($results, 'name'));
+    }
+
     public function test_it_combines_type_and_term(): void
     {
         $handler = new MockHandler([

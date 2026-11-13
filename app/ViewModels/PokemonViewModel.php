@@ -11,6 +11,8 @@ class PokemonViewModel extends ViewModel
         public array $pokemon,
         public ?string $previous = null,
         public ?string $next = null,
+        public ?string $backUrl = null,
+        public ?string $from = null,
     ) {}
 
     public function pokemon(): object
@@ -107,7 +109,7 @@ class PokemonViewModel extends ViewModel
         return collect($this->pokemon['stats'])
             ->map(function ($stat) {
                 return (object) [
-                    'name' => str_replace('-', ' ', $stat['stat']['name']),
+                    'name' => config('pokemon.stat_labels.'.$stat['stat']['name'], str_replace('-', ' ', $stat['stat']['name'])),
                     'value' => $stat['base_stat'],
                     'percentage' => ($stat['base_stat'] * 100) / 255,
                 ];
@@ -126,7 +128,7 @@ class PokemonViewModel extends ViewModel
             ->mapWithKeys(function ($item, $key) {
                 return (object) [
                     $key => (object) [
-                        'name' => ucfirst(str_replace('_', ' ', $key)),
+                        'name' => config('pokemon.sprite_labels.'.$key, ucfirst(str_replace('_', ' ', $key))),
                         'image' => $item ?? config('pokemon.sprite_placeholder'),
                     ],
                 ];
@@ -145,7 +147,7 @@ class PokemonViewModel extends ViewModel
             ->mapWithKeys(function ($item, $key) {
                 return (object) [
                     $key => (object) [
-                        'name' => ucfirst(str_replace(' female', '', str_replace('_', ' ', $key))),
+                        'name' => config('pokemon.sprite_labels.'.$key, ucfirst(str_replace('_', ' ', $key))),
                         'image' => $item ?? config('pokemon.sprite_placeholder'),
                     ],
                 ];

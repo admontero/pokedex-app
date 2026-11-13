@@ -17,10 +17,11 @@ class PokemonSearchDTO
 
         $term = $validated['term'] ?? null;
         $type = $validated['type'] ?? null;
+        $term = is_string($term) ? trim($term) : $term;
 
         return new self(
-            term: $term ? strtolower($term) : null,
-            type: $type ? strtolower($type) : null,
+            term: is_string($term) && $term !== '' ? strtolower($term) : null,
+            type: is_string($type) && $type !== '' ? strtolower($type) : null,
         );
     }
 }
