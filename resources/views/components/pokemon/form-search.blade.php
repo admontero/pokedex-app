@@ -26,16 +26,36 @@
         <div class="col-lg-7 mb-1 mb-lg-0">
             <label class="form-label" for="term">Nombre o número</label>
 
-            <input
-                class="form-control @error('term') is-invalid @enderror"
-                type="search"
-                name="term"
-                id="term"
-                placeholder="Ej. pikachu o 25"
-                value="{{ old('term', request()->term) }}"
-                aria-describedby="term-help @error('term') term-error @enderror"
-                @error('term') aria-invalid="true" autofocus @enderror
-            />
+            <div class="search-suggest" data-suggest-url="{{ route('pokemons.suggest') }}">
+                <input
+                    class="form-control @error('term') is-invalid @enderror"
+                    type="search"
+                    name="term"
+                    id="term"
+                    placeholder="Ej. pikachu o 25"
+                    value="{{ old('term', request()->term) }}"
+                    aria-describedby="term-help @error('term') term-error @enderror"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded="false"
+                    aria-controls="term-suggestions"
+                    aria-haspopup="listbox"
+                    autocomplete="off"
+                    data-suggest-input
+                    @error('term') aria-invalid="true" autofocus @enderror
+                />
+
+                <ul
+                    id="term-suggestions"
+                    class="search-suggest__list list-unstyled mb-0"
+                    role="listbox"
+                    aria-label="Sugerencias de Pokémon"
+                    data-suggest-list
+                    hidden
+                ></ul>
+
+                <div class="visually-hidden" role="status" aria-live="polite" data-suggest-status></div>
+            </div>
 
             <div id="term-help" class="form-text">Busca por nombre o número de Pokédex.</div>
 
