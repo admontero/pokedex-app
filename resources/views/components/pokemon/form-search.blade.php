@@ -37,7 +37,7 @@
                 @error('term') aria-invalid="true" autofocus @enderror
             />
 
-            <div id="term-help" class="form-text">Busca por el nombre del Pokémon.</div>
+            <div id="term-help" class="form-text">Busca por nombre o número de Pokédex.</div>
 
             @error('term')
                 <div id="term-error" class="invalid-feedback d-block small">{{ $message }}</div>

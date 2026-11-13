@@ -45,7 +45,7 @@ class PokemonSearchRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'term.required_without' => 'El campo nombre es requerido si no selecciona un tipo',
+            'term.required_without' => 'El campo nombre o número es requerido si no selecciona un tipo',
         ];
     }
 }

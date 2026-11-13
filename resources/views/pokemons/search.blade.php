@@ -1,6 +1,6 @@
 <x-app-layout
     :title="request()->filled('term') ? 'Resultados para «'.request()->term.'»' : 'Resultados de búsqueda'"
-    description="Resultados de búsqueda de Pokémon por nombre o tipo."
+    description="Resultados de búsqueda de Pokémon por nombre, número o tipo."
 >
     @php
         $term = request()->get('term');

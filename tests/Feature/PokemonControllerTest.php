@@ -55,6 +55,27 @@ class PokemonControllerTest extends TestCase
             ->assertSee('Resultados para');
     }
 
+    public function test_it_searches_pokemon_by_number(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllBySearch')
+                ->once()
+                ->with(Mockery::on(fn ($dto) => $dto->term === '25' && $dto->type === null))
+                ->andReturn([
+                    ['name' => 'pikachu', 'url' => 'https://pokeapi.co/api/v2/pokemon/25/'],
+                ]);
+
+            $mock->shouldReceive('paginate')->once()->andReturn([
+                $this->pokemonCard(['id' => 25, 'name' => 'pikachu']),
+            ]);
+        });
+
+        $this->get('/pokemon/search?term=25')
+            ->assertOk()
+            ->assertSee('pikachu')
+            ->assertSee('Resultados para');
+    }
+
     public function test_it_rejects_an_invalid_search_page_and_type(): void
     {
         $this->get('/pokemon/search?term=pika&page=abc')

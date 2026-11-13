@@ -1,6 +1,6 @@
 <x-app-layout
     title="Inicio"
-    description="Explora la Pokédex: busca Pokémon por nombre o tipo y consulta sus estadísticas, medidas y sprites."
+    description="Explora la Pokédex: busca Pokémon por nombre o número y consulta sus estadísticas, medidas y sprites."
 >
     <section class="hero card border-0 shadow-sm text-center mb-3">
         <h1 class="hero-title">Bienvenido a la Pokédex</h1>
