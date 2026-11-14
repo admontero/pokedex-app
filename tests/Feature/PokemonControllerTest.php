@@ -64,6 +64,39 @@ class PokemonControllerTest extends TestCase
             ->assertSee("localStorage.getItem('pk-theme')", false);
     }
 
+    public function test_the_layout_uses_local_fonts_and_inline_icons(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([]);
+            $mock->shouldReceive('paginate')->once()->andReturn([]);
+        });
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('vendor/fonts/nunito-400.woff2', false)
+            ->assertSee('vendor/fonts/nunito-800.woff2', false)
+            ->assertDontSee('fonts.bunny.net')
+            ->assertDontSee('cdnjs.cloudflare.com');
+    }
+
+    public function test_the_search_page_renders_inline_icons(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllBySearch')->once()->andReturn([
+                ['name' => 'pikachu', 'url' => 'https://pokeapi.co/api/v2/pokemon/25/'],
+            ]);
+
+            $mock->shouldReceive('paginate')->once()->andReturn([
+                $this->pokemonCard(['id' => 25, 'name' => 'pikachu']),
+            ]);
+        });
+
+        $this->get('/pokemon/search?term=pika')
+            ->assertOk()
+            ->assertSee('class="pk-icon', false)
+            ->assertDontSee('fa fa-', false);
+    }
+
     public function test_it_serves_modern_image_formats_with_srcset(): void
     {
         $this->mock(PokemonService::class, function (MockInterface $mock) {
