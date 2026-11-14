@@ -18,17 +18,25 @@
                 <span class="visually-hidden">Cargando más Pokémon…</span>
             </div>
             <div class="infinite-scroll-last">
-                <img src="{{ asset('/vendor/images/pikachu.jpg') }}"
-                    class="d-block mx-auto rounded rounded-3 shadow border border-light" width="200"
-                    height="200" alt="" loading="lazy" />
+                <x-picture
+                    base="vendor/images/pikachu"
+                    fallback="vendor/images/pikachu.jpg"
+                    :width="200"
+                    :height="200"
+                    class="d-block mx-auto rounded rounded-3 shadow border border-light"
+                />
                 <p class="fst-italic mt-4 text-center">
                     ¡Ooops...! Estos son todos los registros hasta ahora.
                 </p>
             </div>
             <div class="infinite-scroll-error">
-                <img class="d-block mx-auto rounded rounded-3 shadow border border-light"
-                    src="{{ asset('/vendor/images/rocket.png') }}" width="200" height="200"
-                    alt="" loading="lazy" />
+                <x-picture
+                    base="vendor/images/rocket"
+                    fallback="vendor/images/rocket.png"
+                    :width="200"
+                    :height="200"
+                    class="d-block mx-auto rounded rounded-3 shadow border border-light"
+                />
                 <p class="fst-italic mt-4 text-center">
                     ¡Oh no, el Equipo Rocket! Tenemos un problema...
                 </p>

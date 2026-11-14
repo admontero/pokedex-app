@@ -1,7 +1,15 @@
-@props(['title', 'description' => null, 'image' => null])
+@props(['title', 'description' => null, 'image' => null, 'imageBase' => null])
 
 <div class="empty-state">
-    @if ($image)
+    @if ($imageBase)
+        <x-picture
+            :base="$imageBase"
+            :fallback="$image"
+            :width="200"
+            :height="200"
+            class="empty-state__image"
+        />
+    @elseif ($image)
         <img class="empty-state__image" src="{{ $image }}" alt="" width="200" height="200" loading="lazy" decoding="async">
     @endif
 

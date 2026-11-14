@@ -94,6 +94,7 @@
                 ? 'No encontramos Pokémon que coincidan con «'.$term.'». Prueba con otro nombre o elimina los filtros.'
                 : 'No encontramos Pokémon para los filtros seleccionados. Prueba con otro tipo o elimina los filtros.'"
             :image="asset('vendor/images/pikachu.jpg')"
+            image-base="vendor/images/pikachu"
         >
             <a class="btn btn-pokemon-red text-white" href="{{ route('pokemons.index') }}">
                 Ver todos los Pokémon

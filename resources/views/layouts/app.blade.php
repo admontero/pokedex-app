@@ -57,7 +57,14 @@
                     href="{{ route('pokemons.index') }}"
                     aria-label="Pokédex, ir al inicio"
                 >
-                    <img src="{{ asset('vendor/images/logo.png') }}" alt="" width="250" height="45"/>
+                    <x-picture
+                        base="vendor/images/logo"
+                        fallback="vendor/images/logo.png"
+                        :width="250"
+                        :height="45"
+                        loading="eager"
+                        fetchpriority="high"
+                    />
                 </a>
 
                 <button

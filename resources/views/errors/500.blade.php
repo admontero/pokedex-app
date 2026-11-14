@@ -7,14 +7,12 @@
     description="No pudimos completar la solicitud. Inténtalo de nuevo en unos momentos."
 >
     <div class="pt-4">
-        <img
-            src="{{ asset('vendor/images/500.png') }}"
+        <x-picture
+            base="vendor/images/500"
+            fallback="vendor/images/500.png"
+            :width="300"
+            :height="162"
             class="img-fluid d-block mx-auto"
-            style="max-width: 300px;"
-            alt=""
-            width="844"
-            height="457"
-            decoding="async"
         />
 
         <div class="row">

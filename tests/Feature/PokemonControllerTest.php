@@ -64,6 +64,23 @@ class PokemonControllerTest extends TestCase
             ->assertSee("localStorage.getItem('pk-theme')", false);
     }
 
+    public function test_it_serves_modern_image_formats_with_srcset(): void
+    {
+        $this->mock(PokemonService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('getAllPokemon')->once()->andReturn([]);
+            $mock->shouldReceive('paginate')->once()->andReturn([]);
+        });
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('type="image/avif"', false)
+            ->assertSee('type="image/webp"', false)
+            ->assertSee('logo-250.avif 1x', false)
+            ->assertSee('logo-500.avif 2x', false)
+            ->assertSee('pikachu-200.avif 1x', false)
+            ->assertSee('pikachu-400.webp 2x', false);
+    }
+
     public function test_it_rejects_an_invalid_page(): void
     {
         $this->get('/?page=abc')
