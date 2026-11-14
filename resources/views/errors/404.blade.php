@@ -3,14 +3,12 @@
     description="No encontramos el Pokémon solicitado. Vuelve al inicio o realiza otra búsqueda."
 >
     <div class="pt-4">
-        <img
-            src="{{ asset('vendor/images/404.png') }}"
+        <x-picture
+            base="vendor/images/404"
+            fallback="vendor/images/404.png"
+            :width="300"
+            :height="186"
             class="img-fluid d-block mx-auto"
-            style="max-width: 300px;"
-            alt=""
-            width="784"
-            height="486"
-            decoding="async"
         />
 
         <div class="row">

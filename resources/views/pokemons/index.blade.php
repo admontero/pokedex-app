@@ -42,6 +42,7 @@
                 title="No hay Pokémon para mostrar"
                 description="No encontramos registros disponibles en este momento. Inténtalo de nuevo en unos segundos."
                 :image="asset('vendor/images/pikachu.jpg')"
+                image-base="vendor/images/pikachu"
             >
                 <a class="btn btn-pokemon-red text-white" href="{{ route('pokemons.index') }}">
                     Volver al inicio

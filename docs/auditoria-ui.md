@@ -383,7 +383,7 @@ Ventajas: contraste alto y uniforme, menos ruido visual, el color sigue identifi
 |---|---|---|---|
 | 19 | Autocompletado/sugerencias y búsqueda por número | Descubribilidad | ✅ |
 | 20 | Modo oscuro con `data-bs-theme` y tokens | Preferencia | ✅ |
-| 21 | WebP/AVIF + `srcset`; comprimir `rocket.png`; eliminar `pikachusin.jpg` | Peso | ⏳ |
+| 21 | WebP/AVIF + `srcset`; comprimir `rocket.png`; eliminar `pikachusin.jpg` | Peso | ✅ |
 | 22 | CI con axe-core/Playwright, Lighthouse CI y validación HTML | Prevención de regresiones | ⏳ |
 | 23 | Pruebas de regresión visual desktop/móvil | Consistencia | ⏳ |
 | 24 | Documentar tokens y patrones de componentes | Mantenibilidad | ⏳ |
@@ -391,6 +391,8 @@ Ventajas: contraste alto y uniforme, menos ruido visual, el color sigue identifi
 > **Autocompletado (19):** el buscador es un combobox ARIA (`role="combobox"`, `aria-autocomplete="list"`, `aria-expanded`/`aria-controls`, listbox `#term-suggestions` y región `aria-live`). Un módulo JS con debounce de 200 ms consulta `GET /pokemon/suggest?term=…`, cancela peticiones anteriores con `AbortController` y permite navegar con ↑/↓/Enter/Escape o con puntero. Las sugerencias se construyen desde el listado ya cacheado (`PokemonSuggestions`) con este orden: prefijo de nombre, número exacto, prefijo de número y coincidencia contenida; se muestran como `#025 Pikachu` y enlazan al detalle con `from` para conservar el breadcrumb de vuelta. Sin JavaScript el formulario sigue funcionando igual.
 >
 > **Modo oscuro (20):** el tema se aplica con `data-bs-theme` en `<html>`. Un script inline en `<head>` lee `localStorage` (clave `pk-theme`) o `prefers-color-scheme` antes de cargar el CSS para evitar el destello; el módulo `theme.js` gestiona el botón de la navbar (`aria-pressed`, icono sol/luna), persiste la elección y sigue los cambios del sistema mientras el usuario no haya elegido. Los tokens `--pk-*` tienen variantes claras y oscuras, y Bootstrap hereda `--bs-body-bg`, `--bs-body-color` y `--bs-border-color` de ellos para que tarjetas, formularios y alertas compartan la misma paleta. Los colores fijos (`bg-white`, `bg-dark bg-opacity-10`, `text-dark`) se sustituyeron por utilidades temáticas (`bg-body`, `bg-body-secondary`, `text-body`).
+>
+> **Imágenes (21):** las ilustraciones locales se sirven con el componente `x-picture`, que emite `<source type="image/avif">` y `<source type="image/webp">` con `srcset` 1x/2x y deja el PNG/JPG como fallback. El script `npm run images` (con `sharp`) genera los derivados y comprime los originales: `rocket.png` pasa de 249 KB a 78 KB, `logo.png` de 50 KB a 11 KB, `404.png`/`500.png` a ~8 KB y `pikachu.jpg` a 16 KB. Se eliminó `pikachusin.jpg`, que no se usaba.
 
 ---
 
