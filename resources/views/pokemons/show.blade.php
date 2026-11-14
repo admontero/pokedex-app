@@ -34,7 +34,7 @@
                 class="btn btn-sm btn-secondary text-white d-inline-flex align-items-center"
                 href="{{ $backUrl ?? route('pokemons.index') }}"
             >
-                <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
+                <x-icon name="arrow-left" class="me-2" />
                 Volver
             </a>
         </div>
@@ -65,13 +65,13 @@
                             rel="prev"
                             aria-label="Anterior: {{ $previous }}"
                         >
-                            <i class="fa fa-arrow-left-long me-2" aria-hidden="true"></i>
+                            <x-icon name="arrow-left-long" class="me-2" />
                             <span>Anterior</span>
                             <span class="prev-next-btn__name ms-1">{{ $previous }}</span>
                         </a>
                     @else
                         <span class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center prev-next-btn disabled" aria-disabled="true">
-                            <i class="fa fa-arrow-left-long me-2" aria-hidden="true"></i>
+                            <x-icon name="arrow-left-long" class="me-2" />
                             <span>Anterior</span>
                         </span>
                     @endif
@@ -85,12 +85,12 @@
                         >
                             <span>Siguiente</span>
                             <span class="prev-next-btn__name ms-1">{{ $next }}</span>
-                            <i class="fa fa-arrow-right-long ms-2" aria-hidden="true"></i>
+                            <x-icon name="arrow-right-long" class="ms-2" />
                         </a>
                     @else
                         <span class="btn btn-sm btn-pokemon-blue text-white d-inline-flex align-items-center prev-next-btn disabled" aria-disabled="true">
                             <span>Siguiente</span>
-                            <i class="fa fa-arrow-right-long ms-2" aria-hidden="true"></i>
+                            <x-icon name="arrow-right-long" class="ms-2" />
                         </span>
                     @endif
                 </div>

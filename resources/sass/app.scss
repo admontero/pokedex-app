@@ -1,14 +1,24 @@
 @import 'variables';
 
+@each $weight in 400, 600, 700, 800 {
+    @font-face {
+        font-family: 'Nunito';
+        font-style: normal;
+        font-weight: $weight;
+        font-display: swap;
+        src: url('/vendor/fonts/nunito-#{$weight}.woff2') format('woff2');
+    }
+}
+
 @font-face {
     font-family: 'Pokemon Solid';
-    src: url('/public/vendor/fonts/Pokemon-Solid.ttf');
+    src: url('/vendor/fonts/Pokemon-Solid.ttf');
     font-display: swap;
 }
 
 @font-face {
     font-family: 'Pokemon Hollow';
-    src: url('/public/vendor/fonts/Pokemon-Hollow.ttf');
+    src: url('/vendor/fonts/Pokemon-Hollow.ttf');
     font-display: swap;
 }
 
@@ -27,6 +37,7 @@
     --pk-border: #DEE2E6;
     --pk-focus: #0D6EFD;
     --pk-focus-dark: #FFCB05;
+    --pk-primary: #0B5ED7;
     --pk-link: #C1121F;
     --pk-tint-base: #FFFFFF;
     --pk-hover: #E9ECEF;
@@ -45,6 +56,7 @@
     --pk-border: #343A40;
     --pk-focus: #6EA8FE;
     --pk-focus-dark: #FFCB05;
+    --pk-primary: #6EA8FE;
     --pk-link: #FF8A94;
     --pk-tint-base: #1A1F26;
     --pk-hover: #2B3138;
@@ -87,6 +99,46 @@ body {
 
 .pokemon-hollow {
     font-family: 'Pokemon Hollow', 'Nunito', sans-serif;
+}
+
+/* Inline icons keep the page free of external icon fonts. */
+.pk-icon {
+    width: 1em;
+    height: 1em;
+    flex: 0 0 auto;
+    vertical-align: -0.125em;
+}
+
+/* ---------------------------------------------------------------- */
+/* Buttons                                                           */
+/* ---------------------------------------------------------------- */
+
+// Bootstrap's outline colors do not reach 4.5:1 on our canvas (especially in
+// dark mode), so they follow the theme tokens instead.
+.btn-outline-primary {
+    --bs-btn-color: var(--pk-primary);
+    --bs-btn-border-color: var(--pk-primary);
+    --bs-btn-hover-color: var(--pk-tint-base);
+    --bs-btn-hover-bg: var(--pk-primary);
+    --bs-btn-hover-border-color: var(--pk-primary);
+    --bs-btn-active-color: var(--pk-tint-base);
+    --bs-btn-active-bg: var(--pk-primary);
+    --bs-btn-active-border-color: var(--pk-primary);
+    --bs-btn-disabled-color: var(--pk-primary);
+    --bs-btn-disabled-border-color: var(--pk-primary);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--pk-muted);
+    --bs-btn-border-color: var(--pk-muted);
+    --bs-btn-hover-color: var(--pk-tint-base);
+    --bs-btn-hover-bg: var(--pk-muted);
+    --bs-btn-hover-border-color: var(--pk-muted);
+    --bs-btn-active-color: var(--pk-tint-base);
+    --bs-btn-active-bg: var(--pk-muted);
+    --bs-btn-active-border-color: var(--pk-muted);
+    --bs-btn-disabled-color: var(--pk-muted);
+    --bs-btn-disabled-border-color: var(--pk-muted);
 }
 
 /* ---------------------------------------------------------------- */

@@ -40,7 +40,7 @@
         </div>
 
         <a class="btn btn-sm btn-secondary text-white" href="{{ route('pokemons.index') }}">
-            <i class="fa fa-arrow-left me-2" aria-hidden="true"></i>
+            <x-icon name="arrow-left" class="me-2" />
             Volver al inicio
         </a>
     </div>
@@ -57,7 +57,7 @@
                 <span class="filter-chip">
                     <span>Término: <strong>{{ $term }}</strong></span>
                     <a class="filter-chip__remove" href="{{ $withoutTerm }}" aria-label="Quitar el filtro de término «{{ $term }}»">
-                        <i class="fa fa-xmark" aria-hidden="true"></i>
+                        <x-icon name="xmark" />
                     </a>
                 </span>
             @endif
@@ -66,7 +66,7 @@
                 <span class="filter-chip">
                     <span>Tipo: <strong>{{ $typeLabel }}</strong></span>
                     <a class="filter-chip__remove" href="{{ $withoutType }}" aria-label="Quitar el filtro de tipo {{ $typeLabel }}">
-                        <i class="fa fa-xmark" aria-hidden="true"></i>
+                        <x-icon name="xmark" />
                     </a>
                 </span>
             @endif
